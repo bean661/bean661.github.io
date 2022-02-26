@@ -18,27 +18,22 @@
   <meta name="description" content="">
   <meta name="author" content="John Doe">
   <meta name="keywords" content="">
-  <meta name="description" content="这是简介。 Quick Start一级标题二级标题三级标题四级标题五级标题六级标题 一级目录名称 水蜜桃 香蕉 西瓜 火龙果         一级  斜体 粗体 删除线 高亮  引用内容    应用内容   BAT：  Baidu ALibaba Tencent   列表 列表内容2 列表内容3  任务列表   跑步    跑步    跳绳   图片  这是一个超链接 页内锚点 第一句 第二句 第">
+  <meta name="description" content="Shell概述Shell是一个命令行解释器，它接收应用程序&#x2F;用户命令，然后调用操作系统内核。 Shell还是一个功能相当强大的编程语言，易编写、易调试、灵活性强。  脚本入门1.脚本格式​    脚本以**#！&#x2F;bin&#x2F;bash**开头（指定解析器） 123456789101112# 创建脚本[linux@localhost datas]$ cat helloworld.sh #!&#x2F;bin&#x2F;bas">
 <meta property="og:type" content="article">
-<meta property="og:title" content="test">
-<meta property="og:url" content="http://example.com/2022/02/21/test/index.html">
+<meta property="og:title" content="Shell入门">
+<meta property="og:url" content="http://example.com/2022/02/25/Shell%E6%A6%82%E8%BF%B0/index.html">
 <meta property="og:site_name" content="guagua后花园">
-<meta property="og:description" content="这是简介。 Quick Start一级标题二级标题三级标题四级标题五级标题六级标题 一级目录名称 水蜜桃 香蕉 西瓜 火龙果         一级  斜体 粗体 删除线 高亮  引用内容    应用内容   BAT：  Baidu ALibaba Tencent   列表 列表内容2 列表内容3  任务列表   跑步    跑步    跳绳   图片  这是一个超链接 页内锚点 第一句 第二句 第">
+<meta property="og:description" content="Shell概述Shell是一个命令行解释器，它接收应用程序&#x2F;用户命令，然后调用操作系统内核。 Shell还是一个功能相当强大的编程语言，易编写、易调试、灵活性强。  脚本入门1.脚本格式​    脚本以**#！&#x2F;bin&#x2F;bash**开头（指定解析器） 123456789101112# 创建脚本[linux@localhost datas]$ cat helloworld.sh #!&#x2F;bin&#x2F;bas">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://gitee.com/Bean6560/images/raw/master/typora/image-20220220192202584.png">
-<meta property="og:image" content="https://gitee.com/Bean6560/images/raw/master/typora/image-20220220201703033.png">
-<meta property="og:image" content="https://gitee.com/Bean6560/images/raw/master/typora/image-20220220201427473.png">
-<meta property="og:image" content="https://gitee.com/Bean6560/images/raw/master/typora/image-20220220201027723.png">
-<meta property="og:image" content="https://gitee.com/Bean6560/images/raw/master/typora/image-20220220195130288.png">
-<meta property="og:image" content="https://gitee.com/Bean6560/images/raw/master/typora/image-20220220194714240.png">
-<meta property="article:published_time" content="2022-02-21T02:03:22.000Z">
-<meta property="article:modified_time" content="2022-02-21T00:53:32.018Z">
+<meta property="og:image" content="https://gitee.com/Bean6560/images/raw/master/typora/image-20220226210036775.png">
+<meta property="article:published_time" content="2022-02-25T02:03:22.000Z">
+<meta property="article:modified_time" content="2022-02-26T13:51:55.319Z">
 <meta property="article:author" content="John Doe">
-<meta property="article:tag" content="教程">
+<meta property="article:tag" content="学习">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://gitee.com/Bean6560/images/raw/master/typora/image-20220220192202584.png">
+<meta name="twitter:image" content="https://gitee.com/Bean6560/images/raw/master/typora/image-20220226210036775.png">
   
-  <title>test - guagua后花园</title>
+  <title>Shell入门 - guagua后花园</title>
 
   <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
 
@@ -184,7 +179,7 @@
       <div class="full-bg-img">
         <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
           <div class="page-header text-center fade-in-up">
-            <span class="h2" id="subtitle" title="test">
+            <span class="h2" id="subtitle" title="Shell入门">
               
             </span>
 
@@ -194,8 +189,8 @@
   
     <span class="post-meta">
       <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-      <time datetime="2022-02-21 10:03" pubdate>
-        2022年2月21日 上午
+      <time datetime="2022-02-25 10:03" pubdate>
+        2022年2月25日 上午
       </time>
     </span>
   
@@ -205,7 +200,7 @@
   
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      291 字
+      635 字
     </span>
   
 
@@ -214,7 +209,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      1 分钟
+      2 分钟
     </span>
   
 
@@ -243,113 +238,21 @@
         <div class="py-5" id="board">
           <article class="post-content mx-auto">
             <!-- SEO header -->
-            <h1 style="display: none">test</h1>
+            <h1 style="display: none">Shell入门</h1>
             
             <div class="markdown-body">
-              <p>这是简介。</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h1 id="一级标题"><a href="#一级标题" class="headerlink" title="一级标题"></a>一级标题</h1><h2 id="二级标题"><a href="#二级标题" class="headerlink" title="二级标题"></a>二级标题</h2><h3 id="三级标题"><a href="#三级标题" class="headerlink" title="三级标题"></a>三级标题</h3><h4 id="四级标题"><a href="#四级标题" class="headerlink" title="四级标题"></a>四级标题</h4><h5 id="五级标题"><a href="#五级标题" class="headerlink" title="五级标题"></a>五级标题</h5><h6 id="六级标题"><a href="#六级标题" class="headerlink" title="六级标题"></a>六级标题</h6><ul>
-<li>一级目录名称<ul>
-<li>水蜜桃<ul>
-<li>香蕉<ul>
-<li>西瓜<ul>
-<li>火龙果</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>一级</li>
-</ul>
-<p><em>斜体</em></p>
-<p><strong>粗体</strong></p>
-<p><del>删除线</del></p>
-<p><code>高亮</code></p>
-<blockquote>
-<p>引用内容</p>
-</blockquote>
-<blockquote>
-<blockquote>
-<p>应用内容</p>
-</blockquote>
-</blockquote>
-<p>BAT：</p>
-<ul>
-<li>Baidu</li>
-<li>ALibaba</li>
-<li>Tencent</li>
-</ul>
-<ol>
-<li>列表</li>
-<li>列表内容2</li>
-<li>列表内容3</li>
-</ol>
-<h5 id="任务列表"><a href="#任务列表" class="headerlink" title="任务列表"></a>任务列表</h5><ul>
-<li><p><input checked="" disabled="" type="checkbox">  跑步</p>
-</li>
-<li><p><input checked="" disabled="" type="checkbox">  跑步</p>
-</li>
-<li><p><input disabled="" type="checkbox">  跳绳</p>
-</li>
-</ul>
-<p>图片</p>
-<p><img src="https://gitee.com/Bean6560/images/raw/master/typora/image-20220220192202584.png" srcset="/img/loading.gif" lazyload alt="image-20220220192202584"></p>
-<p><a href="www.baidu.com">这是一个超链接</a></p>
-<p>页内锚点</p>
-<p><a href="#44">第一句</a> <a href="#45">第二句</a> <a href="#46">第三句</a></p>
-<div id="44">芜湖</div>
+              <h1 id="Shell概述"><a href="#Shell概述" class="headerlink" title="Shell概述"></a>Shell概述</h1><p>Shell是一个<strong>命令行解释器</strong>，它接收应用程序/用户命令，然后调用操作系统内核。</p>
+<p>Shell还是一个功能相当强大的编程语言，易编写、易调试、灵活性强。</p>
+<p><img src="https://gitee.com/Bean6560/images/raw/master/typora/image-20220226210036775.png" srcset="/img/loading.gif" lazyload alt="image-20220226210036775"></p>
+<h1 id="脚本入门"><a href="#脚本入门" class="headerlink" title="脚本入门"></a>脚本入门</h1><h2 id="1-脚本格式"><a href="#1-脚本格式" class="headerlink" title="1.脚本格式"></a><strong>1.脚本格式</strong></h2><p>​    脚本以**#！/bin/bash**开头（指定解析器）</p>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs elixir"><span class="hljs-comment"># 创建脚本</span><br>[linux<span class="hljs-variable">@localhost</span> datas]<span class="hljs-variable">$ </span>cat helloworld.sh <br><span class="hljs-comment">#!/bin/bash</span><br>echo <span class="hljs-string">&quot;hello bean&quot;</span><br><br><span class="hljs-comment"># 执行脚本方式1</span><br>[linux<span class="hljs-variable">@localhost</span> datas]<span class="hljs-variable">$ </span>bash helloworld.sh <br>hello bean<br><br><span class="hljs-comment"># 执行脚本方式2</span><br>[linux<span class="hljs-variable">@localhost</span> datas]<span class="hljs-variable">$ </span>./helloworld.sh<br>-<span class="hljs-symbol">bash:</span> ./<span class="hljs-symbol">helloworld.sh:</span> 权限不够<br></code></pre></td></tr></table></figure>
 
-<div id="45">芜湖</div>
+<p>方式1，本质是bash解析器帮你执行脚本，所以脚本本身不需要执行权限；方式2，本质是脚本自己需要执行，所以需要执行权限</p>
+<h2 id="2-多命令管理"><a href="#2-多命令管理" class="headerlink" title="2.多命令管理"></a><strong>2.多命令管理</strong></h2><p>如，一个sh文件可以进行目录切换、创建文件、追加文件内容能操作。</p>
+<p>需求：在/datas/目录下创建一个banzhang.txt并在文件中写入”I love cls”字符</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-meta">#!/bin/bash</span><br><span class="hljs-built_in">cd</span> /datas/<br>touch banzhang.txt<br><span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;I love cls&quot;</span> &gt;&gt; banzhang.txt<br></code></pre></td></tr></table></figure>
 
-<div id="46">芜湖</div>
-
-<table>
-<thead>
-<tr>
-<th align="center">表头1</th>
-<th align="right">表头2</th>
-<th align="center">表头3</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="center">内容1</td>
-<td align="right">内容2</td>
-<td align="center"></td>
-</tr>
-</tbody></table>
-<table>
-    <thead>
-        <tr>表头1</tr>
-        <tr>表头2</tr>
-        <tr>表头3</tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>内容1-1</td>
-            <td>内容1-2</td>
-            <td>内容1-3</td>
-        </tr>
-        <tr>
-            <td>内容2-1</td>
-            <td>内容2-2</td>
-            <td>内容2-3</td>
-        </tr>
-    </tbody>
-</table>
-
-<p>##我不再是标题</p>
-<hr>
-<hr>
-<hr>
-<p><code>代码块</code></p>
-<p><img src="https://gitee.com/Bean6560/images/raw/master/typora/image-20220220201703033.png" srcset="/img/loading.gif" lazyload alt="image-20220220201703033"></p>
-<p><img src="https://gitee.com/Bean6560/images/raw/master/typora/image-20220220201427473.png" srcset="/img/loading.gif" lazyload alt="image-20220220201427473"></p>
-<p><img src="https://gitee.com/Bean6560/images/raw/master/typora/image-20220220201027723.png" srcset="/img/loading.gif" lazyload alt="image-20220220201027723"></p>
-<p><a target="_blank" rel="noopener" href="https://gitee.com/Bean6560/images/raw/master/typora/image-20220220195130288.png">https://gitee.com/Bean6560/images/raw/master/typora/image-20220220195130288.png</a></p>
-<p><img src="https://gitee.com/Bean6560/images/raw/master/typora/image-20220220195130288.png" srcset="/img/loading.gif" lazyload alt="image-20220220195130288"></p>
-<p><img src="https://gitee.com/Bean6560/images/raw/master/typora/image-20220220194714240.png" srcset="/img/loading.gif" lazyload alt="image-20220220194714240"></p>
+<h2 id="3-Shell中的变量"><a href="#3-Shell中的变量" class="headerlink" title="3.Shell中的变量"></a>3.Shell中的变量</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/Jackson00709/article/details/106086756">【笔记】shell编程——尚硅谷大数据技术之Shell_Jackson00709的博客-CSDN博客</a></p>
 
             </div>
             <hr>
@@ -360,7 +263,7 @@
                   <div class="post-meta">
                     <i class="iconfont icon-tags"></i>
                     
-                      <a class="hover-with-bg" href="/tags/%E6%95%99%E7%A8%8B/">教程</a>
+                      <a class="hover-with-bg" href="/tags/%E5%AD%A6%E4%B9%A0/">学习</a>
                     
                   </div>
                 
@@ -377,18 +280,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2022/02/25/Shell%E6%A6%82%E8%BF%B0/">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">Shell入门</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2022/02/20/2/">
-                        <span class="hidden-mobile">Hello World</span>
+                      <a href="/2022/02/21/test/">
+                        <span class="hidden-mobile">test</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
