@@ -1,0 +1,136 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"><meta name="author" content="Bean"><meta name="renderer" content="webkit"><meta name="copyright" content="Bean"><meta name="keywords" content="Hexo"><meta name="description" content=""><meta name="Cache-Control" content="no-cache"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><title>spring事务失效 事务不回滚回滚 · Mr.Bean's Blog</title><link rel="stylesheet" href="/css/style.css?v=2018.7.9"><link rel="stylesheet" href="/css/animation.css?v=2018.7.9"><link rel="icon" href="/img/assets/favicon.ico"><link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css?version=1.5.6"><!-- scripts--><script>(function( w ){
+  "use strict";
+  // rel=preload support test
+  if( !w.loadCSS ){
+    w.loadCSS = function(){};
+  }
+  // define on the loadCSS obj
+  var rp = loadCSS.relpreload = {};
+  // rel=preload feature support test
+  // runs once and returns a function for compat purposes
+  rp.support = (function(){
+    var ret;
+    try {
+      ret = w.document.createElement( "link" ).relList.supports( "preload" );
+    } catch (e) {
+      ret = false;
+    }
+    return function(){
+      return ret;
+    };
+  })();
+
+  // if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+  // then change that media back to its intended value on load
+  rp.bindMediaToggle = function( link ){
+    // remember existing media attr for ultimate state, or default to 'all'
+    var finalMedia = link.media || "all";
+
+    function enableStylesheet(){
+      link.media = finalMedia;
+    }
+
+    // bind load handlers to enable media
+    if( link.addEventListener ){
+      link.addEventListener( "load", enableStylesheet );
+    } else if( link.attachEvent ){
+      link.attachEvent( "onload", enableStylesheet );
+    }
+
+    // Set rel and non-applicable media type to start an async request
+    // note: timeout allows this to happen async to let rendering continue in IE
+    setTimeout(function(){
+      link.rel = "stylesheet";
+      link.media = "only x";
+    });
+    // also enable media after 3 seconds,
+    // which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+    setTimeout( enableStylesheet, 3000 );
+  };
+
+  // loop through link elements in DOM
+  rp.poly = function(){
+    // double check this to prevent external calls from running
+    if( rp.support() ){
+      return;
+    }
+    var links = w.document.getElementsByTagName( "link" );
+    for( var i = 0; i < links.length; i++ ){
+      var link = links[ i ];
+      // qualify links to those with rel=preload and as=style attrs
+      if( link.rel === "preload" && link.getAttribute( "as" ) === "style" && !link.getAttribute( "data-loadcss" ) ){
+        // prevent rerunning on link
+        link.setAttribute( "data-loadcss", true );
+        // bind listeners to toggle media back
+        rp.bindMediaToggle( link );
+      }
+    }
+  };
+
+  // if unsupported, run the polyfill
+  if( !rp.support() ){
+    // run once at least
+    rp.poly();
+
+    // rerun poly on an interval until onload
+    var run = w.setInterval( rp.poly, 500 );
+    if( w.addEventListener ){
+      w.addEventListener( "load", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    } else if( w.attachEvent ){
+      w.attachEvent( "onload", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    }
+  }
+
+
+  // commonjs
+  if( typeof exports !== "undefined" ){
+    exports.loadCSS = loadCSS;
+  }
+  else {
+    w.loadCSS = loadCSS;
+  }
+}( typeof global !== "undefined" ? global : this ) );</script><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" defer></script><script src="/js/main.js?v=2018.7.9" defer></script><!-- fancybox--><link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" defer></script><!-- busuanzi--><script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script><meta name="generator" content="Hexo 6.3.0"></head><body><section class="profile-close" id="cxo-profile"><div class="profile-avatar"><i class="fa fa-caret-left"></i><img src="https://raw.githubusercontent.com/bean661/images/main/img/202303272339548.jpg"></div><!--.profile-saying
+  i.fa.fa-comment
+  .saying--><div class="cxo-profile-inner"><div class="profile-name">Bean</div><div class="profile-signature">for me</div><div class="friends"><div>FRIENDS</div><span><a href="https://www.happyshark.cn/" target="_black">AChao</a></span></div><div class="read-progress"></div></div></section><header id="cxo-intro" style="height: 70vh;background-image: url(/img/intro/index-bg.png);"><nav id="cxo-intro-nav"><section><div class="intro-nav-title"><a href="/">Mr.Bean's Blog</a></div><div class="intro-nav-label-box"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div><i class="fa fa-bars intro-nav-menu"><div class="intro-nav-drop"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div></i><div class="clear"></div></section></nav><h1 class="post-title">spring事务失效 事务不回滚回滚</h1><div class="post-intros"><div class="post-intro-meta"><span class="post-intro-time"><i class="post-intro-calendar fa fa-edit"></i><span>2023-12-20</span></span><span class="post-intro-tags"><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="事务"> 事务</a><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="Spring"> Spring</a></span></div><div class="post-intro-read"><span> Word count: <span class="post-count">1.8k</span> | Reading time: <span class="post-count">6</span>min</span></div></div></header><article class="cxo-up" id="cxo-content-outer"><section id="cxo-content-inner"><article class="article-entry" id="post"><h1 id="事务"><a href="#事务" class="headerlink" title="事务"></a>事务</h1><p>事务在逻辑上是一组操作，要么执行，要不都不执行。主要是针对数据库而言的，比如说 MySQL。<br>为了保证事务是正确可靠的，在数据库进行写入或者更新操作时，就必须得表现出 ACID 的 4 个重要特性：</p>
+<p>原子性（Atomicity）：一个事务中的所有操作，要么全部完成，要么全部不完成，不会结束在中间某个环节。事务在执行过程中发生错误，会被回滚（Rollback）到事务开始前的状态，就像这个事务从来没有执行过一样。<br>一致性（Consistency）：在事务开始之前和事务结束以后，数据库的完整性没有被破坏。<br>事务隔离（Isolation）：数据库允许多个并发事务同时对其数据进行读写和修改，隔离性可以防止多个事务并发执行时由于交叉执行而导致数据的不一致。<br>持久性（Durability）：事务处理结束后，对数据的修改就是永久的，即便系统故障也不会丢失。<br>其中，事务隔离又分为 4 种不同的级别，包括：</p>
+<p>未提交读（Read uncommitted），最低的隔离级别，允许“脏读”（dirty reads），事务可以看到其他事务“尚未提交”的修改。如果另一个事务回滚，那么当前事务读到的数据就是脏数据。<br>提交读（read committed），一个事务可能会遇到不可重复读（Non Repeatable Read）的问题。不可重复读是指，在一个事务内，多次读同一数据，在这个事务还没有结束时，如果另一个事务恰好修改了这个数据，那么，在第一个事务中，两次读取的数据就可能不一致。<br>可重复读（repeatable read），一个事务可能会遇到幻读（Phantom Read）的问题。幻读是指，在一个事务中，第一次查询某条记录，发现没有，但是，当试图更新这条不存在的记录时，竟然能成功，并且，再次读取同一条记录，它就神奇地出现了。<br>串行化（Serializable），最严格的隔离级别，所有事务按照次序依次执行，因此，脏读、不可重复读、幻读都不会出现。虽然 Serializable 隔离级别下的事务具有最高的安全性，但是，由于事务是串行执行，所以效率会大大下降，应用程序的性能会急剧降低。如果没有特别重要的情景，一般都不会使用 Serializable 隔离级别。</p>
+<h1 id="Spring事务"><a href="#Spring事务" class="headerlink" title="Spring事务"></a>Spring事务</h1><p>Spring 支持两种事务方式，分别是编程式事务和声明式事务，后者最常见，通常情况下只需要一个 <code>@Transactional</code>就搞定了（代码侵入性降到了最低）</p>
+<h4 id="编程式事务"><a href="#编程式事务" class="headerlink" title="编程式事务"></a>编程式事务</h4><p>编程式事务是指将事务管理代码嵌入嵌入到业务代码中，来控制事务的提交和回滚。</p>
+<p>声明式事务将事务管理代码从业务方法中抽离了出来，以声明式的方式来实现事务管理，对于开发者来说，声明式事务显然比编程式事务更易用、更好用。<br>当然了，要想实现事务管理和业务代码的抽离，就必须得用到 Spring 当中的AOP，其本质是对方法前后进行拦截，然后在目标方法开始之前创建或者加入一个事务，执行完目标方法之后根据执行的情况提交或者回滚。</p>
+<p><strong>声明式事务虽然优于编程式事务，但也有不足，声明式事务管理的粒度是方法级别，而编程式事务是可以精确到代码块级别的。</strong></p>
+<h1 id="事务不生效"><a href="#事务不生效" class="headerlink" title="事务不生效"></a>事务不生效</h1><h2 id="方法内部调用"><a href="#方法内部调用" class="headerlink" title="方法内部调用"></a>方法内部调用</h2><p>在一个类中直接调用另外一个事务的方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">Service</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">UserService</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> UserMapper userMapper;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Transactional</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">add</span><span class="params">(UserModel userModel)</span> &#123;</span><br><span class="line">        userMapper.insertUser(userModel);</span><br><span class="line">        updateStatus(userModel);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Transactional</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">updateStatus</span><span class="params">(UserModel userModel)</span> &#123;</span><br><span class="line">        doSameThing();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>直接调用了this对象的方法，所以updateStatus方法不会生成事务</strong>。</p>
+<p>解决办法：新加一个service类，使两个方法不在同一个类中</p>
+<p>或者在该Service类中注入自己也是一种选择。</p>
+<p>使用AopContext.currentProxy()获取代理对象</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Servcie</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">ServiceA</span> &#123;</span><br><span class="line"></span><br><span class="line"> </span><br><span class="line">   <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">save</span><span class="params">(User user)</span> &#123;</span><br><span class="line">         queryData1();</span><br><span class="line">         queryData2();</span><br><span class="line">         ((ServiceA)AopContext.currentProxy()).doSave(user);</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   <span class="meta">@Transactional(rollbackFor=Exception.class)</span></span><br><span class="line">   <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">doSave</span><span class="params">(User user)</span> &#123;</span><br><span class="line">       addData1();</span><br><span class="line">       updateData2();</span><br><span class="line">    &#125;</span><br><span class="line"> &#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="访问权限问题"><a href="#访问权限问题" class="headerlink" title="访问权限问题"></a>访问权限问题</h2><p>方法的访问权限被定义成了private，这样会导致事务失效，spring要求被代理方法必须是public的。</p>
+<h2 id="方法用final修饰"><a href="#方法用final修饰" class="headerlink" title="方法用final修饰"></a>方法用final修饰</h2><p>方法被定义成了final的，这样会导致事务失效。</p>
+<p>spring事务底层使用了aop，也就是通过jdk动态代理或者cglib，帮我们生成了代理类，在代理类中实现的事务功能。</p>
+<p>但如果某个方法用final修饰了，那么在它的代理类中，就无法重写该方法，而添加事务功能。</p>
+<p><strong>注意</strong>：如果某个方法是<strong>static</strong>的，同样无法通过动态代理，变成事务方法。</p>
+<h2 id="未被spring管理"><a href="#未被spring管理" class="headerlink" title="未被spring管理"></a>未被spring管理</h2><p>如果忘了加@Service注解，该类不会交给spring管理，所以它的进行事务方法也不会生成事务。</p>
+<h2 id="多线程调用"><a href="#多线程调用" class="headerlink" title="多线程调用"></a>多线程调用</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Slf4j</span></span><br><span class="line"><span class="meta">@Service</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">UserService</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> UserMapper userMapper;</span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> RoleService roleService;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Transactional</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">add</span><span class="params">(UserModel userModel)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        userMapper.insertUser(userModel);</span><br><span class="line">        <span class="keyword">new</span> <span class="title class_">Thread</span>(() -&gt; &#123;</span><br><span class="line">            roleService.doOtherThing();</span><br><span class="line">        &#125;).start();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Service</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">RoleService</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Transactional</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">doOtherThing</span><span class="params">()</span> &#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;保存role表数据&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>事务方法add中，调用了事务方法doOtherThing，但是事务方法doOtherThing是在另外一个线程中调用的。</p>
+<p>这样会导致两个方法不在同一个线程中，获取到的数据库连接不一样，从而是两个不同的事务。如果想doOtherThing方法中抛了异常，add方法也回滚是不可能的。<br>————————————————<br>版权声明：本文为CSDN博主「小小工匠」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。<br>原文链接：<a target="_blank" rel="noopener" href="https://blog.csdn.net/yangshangwei/article/details/120106632">https://blog.csdn.net/yangshangwei/article/details/120106632</a></p>
+<h2 id="表不支持事务"><a href="#表不支持事务" class="headerlink" title="表不支持事务"></a>表不支持事务</h2><p>在mysql5之前，默认的数据库引擎是myisam。 索引文件和数据文件是分开存储的，对于查多写少的单表操作，性能比innodb更好。</p>
+<h1 id="事务不回滚"><a href="#事务不回滚" class="headerlink" title="事务不回滚"></a>事务不回滚</h1><h2 id="错误的传播特性"><a href="#错误的传播特性" class="headerlink" title="错误的传播特性"></a>错误的传播特性</h2><p>spring目前支持7种传播特性</p>
+<p>如果在手动设置propagation参数的时候，把传播特性设置错了，可能就打不到想要的效果。</p>
+<p>目前只有这三种传播特性才会创建新事务：REQUIRED，REQUIRES_NEW，NESTED。</p>
+<h2 id="自己吞了异常"><a href="#自己吞了异常" class="headerlink" title="自己吞了异常"></a>自己吞了异常</h2><p>最常见的问题是：开发者在代码中手动try…catch了异常。</p>
+<h2 id="手动抛了别的异常"><a href="#手动抛了别的异常" class="headerlink" title="手动抛了别的异常"></a>手动抛了别的异常</h2><p>即使开发者没有手动捕获异常，但如果抛的异常不正确，spring事务也不会回滚。</p>
+<p>因为spring事务，默认情况下只会回滚RuntimeException（运行时异常）和Error（错误），对于普通的Exception（非运行时异常），它不会回滚。</p>
+<h1 id=""><a href="#" class="headerlink" title=""></a></h1><hr>
+<p>参考：<a target="_blank" rel="noopener" href="http://t.csdnimg.cn/VXhav">Spring的事务详解_spring事务-CSDN博客</a></p>
+<p><a target="_blank" rel="noopener" href="http://t.csdnimg.cn/ukVG6">每日一博 - 常见的Spring事务失效&amp;事务不回滚案例集锦-CSDN博客</a></p>
+</article><!-- lincense--><div class="license-wrapper"><p> <span>Author:  </span><a href="http://example.com">Bean</a></p><p> <span>Link:  </span><a href="http://example.com/2023/12/20/%E4%BA%8B%E5%8A%A1%E4%B8%8D%E5%9B%9E%E6%BB%9A/">http://example.com/2023/12/20/%E4%BA%8B%E5%8A%A1%E4%B8%8D%E5%9B%9E%E6%BB%9A/</a></p><p> <span>Copyright:  </span><span>All articles in this blog are licensed under <a rel="license noopener" target="_blank" href="https://creativecommons.org/licenses/by-nc-nd/3.0">CC BY-NC-SA 3.0</a> unless stating additionally.</span></p></div><div class="post-paginator"><a class="nextSlogan" href="/2023/12/19/%E8%BF%90%E8%A1%8C%E6%97%B6%E6%8F%90%E7%A4%BA%E5%8C%85%E4%B8%8D%E5%AD%98%E5%9C%A8/" title="运行时提示包不存在"><span>NextPost ></span><br><span class="nextTitle">运行时提示包不存在</span></a><div class="clear"></div></div><div id="comment"><div id="SOHUCS" sid="/2023/12/20/%E4%BA%8B%E5%8A%A1%E4%B8%8D%E5%9B%9E%E6%BB%9A/"></div><script charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/changyan.js"></script><script>window.changyan.api.config({appid: 'cywUFG3US', conf: '5069ff4a80c8ae40509708fb69d6f29e'});</script></div></section></article><footer id="cxo-footer-outer"><div id="cxo-footer-inner"><p class="footer-container"><span>Site by </span><a target="_blank" rel="noopener" href="http://hexo.io"><span>Hexo</span></a><span> | theme </span><a target="_blank" rel="noopener" href="https://github.com/Longlongyu/hexo-theme-Cxo"><span>Cxo</span></a></p><i class="fa fa-user"> </i><span id="busuanzi_value_site_uv"></span><span> | </span><i class="fa fa-eye"> </i><span id="busuanzi_value_site_pv"></span></div></footer><!-- catelog--><div class="toc-wrapper" style="top: 70vh;"><div class="toc-catalog"><i class="fa fa-list"> </i><span>CATALOG</span></div><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BA%8B%E5%8A%A1"><span class="toc-number">1.</span> <span class="toc-text">事务</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Spring%E4%BA%8B%E5%8A%A1"><span class="toc-number">2.</span> <span class="toc-text">Spring事务</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%BC%96%E7%A8%8B%E5%BC%8F%E4%BA%8B%E5%8A%A1"><span class="toc-number">2.0.0.1.</span> <span class="toc-text">编程式事务</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BA%8B%E5%8A%A1%E4%B8%8D%E7%94%9F%E6%95%88"><span class="toc-number">3.</span> <span class="toc-text">事务不生效</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%96%B9%E6%B3%95%E5%86%85%E9%83%A8%E8%B0%83%E7%94%A8"><span class="toc-number">3.1.</span> <span class="toc-text">方法内部调用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AE%BF%E9%97%AE%E6%9D%83%E9%99%90%E9%97%AE%E9%A2%98"><span class="toc-number">3.2.</span> <span class="toc-text">访问权限问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%96%B9%E6%B3%95%E7%94%A8final%E4%BF%AE%E9%A5%B0"><span class="toc-number">3.3.</span> <span class="toc-text">方法用final修饰</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9C%AA%E8%A2%ABspring%E7%AE%A1%E7%90%86"><span class="toc-number">3.4.</span> <span class="toc-text">未被spring管理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A4%9A%E7%BA%BF%E7%A8%8B%E8%B0%83%E7%94%A8"><span class="toc-number">3.5.</span> <span class="toc-text">多线程调用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%A1%A8%E4%B8%8D%E6%94%AF%E6%8C%81%E4%BA%8B%E5%8A%A1"><span class="toc-number">3.6.</span> <span class="toc-text">表不支持事务</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BA%8B%E5%8A%A1%E4%B8%8D%E5%9B%9E%E6%BB%9A"><span class="toc-number">4.</span> <span class="toc-text">事务不回滚</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%94%99%E8%AF%AF%E7%9A%84%E4%BC%A0%E6%92%AD%E7%89%B9%E6%80%A7"><span class="toc-number">4.1.</span> <span class="toc-text">错误的传播特性</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%87%AA%E5%B7%B1%E5%90%9E%E4%BA%86%E5%BC%82%E5%B8%B8"><span class="toc-number">4.2.</span> <span class="toc-text">自己吞了异常</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%89%8B%E5%8A%A8%E6%8A%9B%E4%BA%86%E5%88%AB%E7%9A%84%E5%BC%82%E5%B8%B8"><span class="toc-number">4.3.</span> <span class="toc-text">手动抛了别的异常</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link"><span class="toc-number">5.</span> <span class="toc-text"></span></a></li></ol></div><!-- top--><i class="fa fa-arrow-up close" id="go-up" aria-hidden="true"></i></body></html>
