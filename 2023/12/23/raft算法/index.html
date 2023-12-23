@@ -1,0 +1,146 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"><meta name="author" content="Bean"><meta name="renderer" content="webkit"><meta name="copyright" content="Bean"><meta name="keywords" content="Hexo"><meta name="description" content=""><meta name="Cache-Control" content="no-cache"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><title>raft算法 · Mr.Bean's Blog</title><link rel="stylesheet" href="/css/style.css?v=2018.7.9"><link rel="stylesheet" href="/css/animation.css?v=2018.7.9"><link rel="icon" href="/img/assets/favicon.ico"><link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css?version=1.5.6"><!-- scripts--><script>(function( w ){
+  "use strict";
+  // rel=preload support test
+  if( !w.loadCSS ){
+    w.loadCSS = function(){};
+  }
+  // define on the loadCSS obj
+  var rp = loadCSS.relpreload = {};
+  // rel=preload feature support test
+  // runs once and returns a function for compat purposes
+  rp.support = (function(){
+    var ret;
+    try {
+      ret = w.document.createElement( "link" ).relList.supports( "preload" );
+    } catch (e) {
+      ret = false;
+    }
+    return function(){
+      return ret;
+    };
+  })();
+
+  // if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+  // then change that media back to its intended value on load
+  rp.bindMediaToggle = function( link ){
+    // remember existing media attr for ultimate state, or default to 'all'
+    var finalMedia = link.media || "all";
+
+    function enableStylesheet(){
+      link.media = finalMedia;
+    }
+
+    // bind load handlers to enable media
+    if( link.addEventListener ){
+      link.addEventListener( "load", enableStylesheet );
+    } else if( link.attachEvent ){
+      link.attachEvent( "onload", enableStylesheet );
+    }
+
+    // Set rel and non-applicable media type to start an async request
+    // note: timeout allows this to happen async to let rendering continue in IE
+    setTimeout(function(){
+      link.rel = "stylesheet";
+      link.media = "only x";
+    });
+    // also enable media after 3 seconds,
+    // which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+    setTimeout( enableStylesheet, 3000 );
+  };
+
+  // loop through link elements in DOM
+  rp.poly = function(){
+    // double check this to prevent external calls from running
+    if( rp.support() ){
+      return;
+    }
+    var links = w.document.getElementsByTagName( "link" );
+    for( var i = 0; i < links.length; i++ ){
+      var link = links[ i ];
+      // qualify links to those with rel=preload and as=style attrs
+      if( link.rel === "preload" && link.getAttribute( "as" ) === "style" && !link.getAttribute( "data-loadcss" ) ){
+        // prevent rerunning on link
+        link.setAttribute( "data-loadcss", true );
+        // bind listeners to toggle media back
+        rp.bindMediaToggle( link );
+      }
+    }
+  };
+
+  // if unsupported, run the polyfill
+  if( !rp.support() ){
+    // run once at least
+    rp.poly();
+
+    // rerun poly on an interval until onload
+    var run = w.setInterval( rp.poly, 500 );
+    if( w.addEventListener ){
+      w.addEventListener( "load", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    } else if( w.attachEvent ){
+      w.attachEvent( "onload", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    }
+  }
+
+
+  // commonjs
+  if( typeof exports !== "undefined" ){
+    exports.loadCSS = loadCSS;
+  }
+  else {
+    w.loadCSS = loadCSS;
+  }
+}( typeof global !== "undefined" ? global : this ) );</script><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" defer></script><script src="/js/main.js?v=2018.7.9" defer></script><!-- fancybox--><link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" defer></script><!-- busuanzi--><script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script><meta name="generator" content="Hexo 6.3.0"></head><body><section class="profile-close" id="cxo-profile"><div class="profile-avatar"><i class="fa fa-caret-left"></i><img src="https://raw.githubusercontent.com/bean661/images/main/img/202303272339548.jpg"></div><!--.profile-saying
+  i.fa.fa-comment
+  .saying--><div class="cxo-profile-inner"><div class="profile-name">Bean</div><div class="profile-signature">for me</div><div class="friends"><div>FRIENDS</div><span><a href="https://www.happyshark.cn/" target="_black">AChao</a></span></div><div class="read-progress"></div></div></section><header id="cxo-intro" style="height: 70vh;background-image: url(/img/intro/index-bg.png);"><nav id="cxo-intro-nav"><section><div class="intro-nav-title"><a href="/">Mr.Bean's Blog</a></div><div class="intro-nav-label-box"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div><i class="fa fa-bars intro-nav-menu"><div class="intro-nav-drop"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div></i><div class="clear"></div></section></nav><h1 class="post-title">raft算法</h1><div class="post-intros"><div class="post-intro-meta"><span class="post-intro-time"><i class="post-intro-calendar fa fa-edit"></i><span>2023-12-23</span></span><span class="post-intro-tags"><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="一致性算法"> 一致性算法</a></span></div><div class="post-intro-read"><span> Word count: <span class="post-count">921</span> | Reading time: <span class="post-count">3</span>min</span></div></div></header><article class="cxo-up" id="cxo-content-outer"><section id="cxo-content-inner"><article class="article-entry" id="post"><p>raft算法是保证强一致性的。</p>
+<h2 id="①-Leader的选举和Failover过程"><a href="#①-Leader的选举和Failover过程" class="headerlink" title="① Leader的选举和Failover过程"></a>① Leader的选举和Failover过程</h2><h3 id="Leader的选举过程"><a href="#Leader的选举过程" class="headerlink" title="Leader的选举过程"></a>Leader的选举过程</h3><p>启动时，所有的节点都是follower状态，每个节点都有自己的election timeout 选举的超时时间，如果在时间到达时还没有收到leader节点的心跳，就会发起新一轮的选举，</p>
+<p>把自己的trem值+1，状态切换为Candidate 候选者 状态，给自己投票，并向集群的每个节点发起拉票选举，其他的机器都会把赞成票投给他</p>
+<p>如果节点的得票数超过了集群节点的一半，就会成为leader，然后向其他节点不断的发送心跳。</p>
+<h3 id="Failover过程"><a href="#Failover过程" class="headerlink" title="Failover过程"></a>Failover过程</h3><p>当leader节点宕机时，会根据et的时间，重新对节点进行选取，最先结束的节点会变为c候选人的状态，并向自己投票、通过rpc像其他节点拉票，当票数大于一半时，就会成为leader，然后对follower节点不断的发送心跳。</p>
+<p><img src="https://raw.githubusercontent.com/bean661/images/main/img/msedge_zplHBDGnw4.png"></p>
+<h2 id="②-在出现“投票分裂”的时候，如何选出Leader节点"><a href="#②-在出现“投票分裂”的时候，如何选出Leader节点" class="headerlink" title="② 在出现“投票分裂”的时候，如何选出Leader节点"></a>② 在出现“投票分裂”的时候，如何选出Leader节点</h2><ol>
+<li><p>A B 同时超时，同时变为candidate状态</p>
+</li>
+<li><p>AB都给自己投一票</p>
+</li>
+<li><p>（分裂投票）AB两个节点收到的票数相同，且不超过半数，所以就都无法当选leader</p>
+</li>
+<li><p>AB继续向没有回复的节点发起请求，一直发</p>
+</li>
+<li><p>直到C节点超时，C向自己投票，同时向AB等其他节点拉票，这些节点包括AB都会把票数投给C，因此C成为leader</p>
+</li>
+</ol>
+<h2 id="③-raft-算法的日志复制过程（Log-Replication）"><a href="#③-raft-算法的日志复制过程（Log-Replication）" class="headerlink" title="③ raft 算法的日志复制过程（Log Replication）"></a>③ raft 算法的日志复制过程（Log Replication）</h2><p>raft log的日志复制过程</p>
+<ol>
+<li><p>leader A节点写了三条数据到磁盘，但是未提交到状态机</p>
+</li>
+<li><p>然后A向其他节点发起复制日志的请求，当follower节点接收到日志之后，会向A节点发送应答，A继续发送下一条日志，。。。，当超过半数节点（假设有五个节点，活跃的有leader A和followerB）写入日志，才会提交修改状态。</p>
+</li>
+<li><p>此时C节点恢复，A向C发送一条，C响应给A，然后A把第一条状态进行提交</p>
+</li>
+<li><p>A继续发送第二条数据，同时让C把第一条改为已提交，C给A反馈，A把第二条改为已提交</p>
+</li>
+<li><p>A向C发送第三天数据和C提交第二条的指令，同时给B发送提交的指令，C给A反馈，A把第三条改为已提交</p>
+</li>
+<li><p>A通知BC，把第三条改为已提交</p>
+</li>
+</ol>
+<h2 id="④-修复不一致的日志（Repairing-Inconsistencies）"><a href="#④-修复不一致的日志（Repairing-Inconsistencies）" class="headerlink" title="④ 修复不一致的日志（Repairing Inconsistencies）"></a>④ 修复不一致的日志（Repairing Inconsistencies）</h2><p>按照上面的状态，A又写了两条，并且宕机了</p>
+<ol>
+<li><p>此时B超时，成为leader，初始化所有节点的next index 让所有节点的next index和自己的保持一致，会进行一致性检查请求，</p>
+</li>
+<li><p>此时来了节点D恢复了，他还没有数据，因此回复数据不一致，3 2 1，倒序的依次排查，然后依次的向D节点发送数据，直到数据一致。</p>
+</li>
+<li><p>然后B写入第四条数据，CD也写入，此时A恢复了，B会把自己的数据写入A，保证数据的强一致性。</p>
+</li>
+</ol>
+<h2 id="⑤-如何保证数据安全性（Safety）"><a href="#⑤-如何保证数据安全性（Safety）" class="headerlink" title="⑤ 如何保证数据安全性（Safety）"></a>⑤ 如何保证数据安全性（Safety）</h2><p>在节点选举的过程中，会比较term和index的值，先比较term，其次是index。如果其他节点的比候选人的值大，就投反对票。</p>
+<hr>
+<p>这篇文章主要对视频进行一个文字描述，【动画：Raft算法Leader选举、脑裂后选举、日志复制、修复不一致日志和数据安全】 <a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1so4y1r7eM/?share_source=copy_web&vd_source=85505e242f32966ffe62e5d66ea85716">https://www.bilibili.com/video/BV1so4y1r7eM/?share_source=copy_web&amp;vd_source=85505e242f32966ffe62e5d66ea85716</a></p>
+<p>raft github：Raft算法动画的官网地址：   <a target="_blank" rel="noopener" href="https://raft.github.io/">https://raft.github.io/</a></p>
+</article><!-- lincense--><div class="license-wrapper"><p> <span>Author:  </span><a href="http://example.com">Bean</a></p><p> <span>Link:  </span><a href="http://example.com/2023/12/23/raft%E7%AE%97%E6%B3%95/">http://example.com/2023/12/23/raft%E7%AE%97%E6%B3%95/</a></p><p> <span>Copyright:  </span><span>All articles in this blog are licensed under <a rel="license noopener" target="_blank" href="https://creativecommons.org/licenses/by-nc-nd/3.0">CC BY-NC-SA 3.0</a> unless stating additionally.</span></p></div><div class="post-paginator"><a class="prevSlogan" href="/2023/12/23/zab%E5%8D%8F%E8%AE%AE/" title="zab协议"><span>< PreviousPost</span><br><span class="prevTitle">zab协议</span></a><a class="nextSlogan" href="/2023/12/23/eureka%E5%92%8Cnacos%E4%BB%A5%E5%8F%8Azookeeper%E7%9A%84%E5%8C%BA%E5%88%AB/" title="eureka和nacos以及zookeeper的区别"><span>NextPost ></span><br><span class="nextTitle">eureka和nacos以及zookeeper的区别</span></a><div class="clear"></div></div><div id="comment"><div id="SOHUCS" sid="/2023/12/23/raft%E7%AE%97%E6%B3%95/"></div><script charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/changyan.js"></script><script>window.changyan.api.config({appid: 'cywUFG3US', conf: '5069ff4a80c8ae40509708fb69d6f29e'});</script></div></section></article><footer id="cxo-footer-outer"><div id="cxo-footer-inner"><p class="footer-container"><span>Site by </span><a target="_blank" rel="noopener" href="http://hexo.io"><span>Hexo</span></a><span> | theme </span><a target="_blank" rel="noopener" href="https://github.com/Longlongyu/hexo-theme-Cxo"><span>Cxo</span></a></p><i class="fa fa-user"> </i><span id="busuanzi_value_site_uv"></span><span> | </span><i class="fa fa-eye"> </i><span id="busuanzi_value_site_pv"></span></div></footer><!-- catelog--><div class="toc-wrapper" style="top: 70vh;"><div class="toc-catalog"><i class="fa fa-list"> </i><span>CATALOG</span></div><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E2%91%A0-Leader%E7%9A%84%E9%80%89%E4%B8%BE%E5%92%8CFailover%E8%BF%87%E7%A8%8B"><span class="toc-number">1.</span> <span class="toc-text">① Leader的选举和Failover过程</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Leader%E7%9A%84%E9%80%89%E4%B8%BE%E8%BF%87%E7%A8%8B"><span class="toc-number">1.1.</span> <span class="toc-text">Leader的选举过程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Failover%E8%BF%87%E7%A8%8B"><span class="toc-number">1.2.</span> <span class="toc-text">Failover过程</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E2%91%A1-%E5%9C%A8%E5%87%BA%E7%8E%B0%E2%80%9C%E6%8A%95%E7%A5%A8%E5%88%86%E8%A3%82%E2%80%9D%E7%9A%84%E6%97%B6%E5%80%99%EF%BC%8C%E5%A6%82%E4%BD%95%E9%80%89%E5%87%BALeader%E8%8A%82%E7%82%B9"><span class="toc-number">2.</span> <span class="toc-text">② 在出现“投票分裂”的时候，如何选出Leader节点</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E2%91%A2-raft-%E7%AE%97%E6%B3%95%E7%9A%84%E6%97%A5%E5%BF%97%E5%A4%8D%E5%88%B6%E8%BF%87%E7%A8%8B%EF%BC%88Log-Replication%EF%BC%89"><span class="toc-number">3.</span> <span class="toc-text">③ raft 算法的日志复制过程（Log Replication）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E2%91%A3-%E4%BF%AE%E5%A4%8D%E4%B8%8D%E4%B8%80%E8%87%B4%E7%9A%84%E6%97%A5%E5%BF%97%EF%BC%88Repairing-Inconsistencies%EF%BC%89"><span class="toc-number">4.</span> <span class="toc-text">④ 修复不一致的日志（Repairing Inconsistencies）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E2%91%A4-%E5%A6%82%E4%BD%95%E4%BF%9D%E8%AF%81%E6%95%B0%E6%8D%AE%E5%AE%89%E5%85%A8%E6%80%A7%EF%BC%88Safety%EF%BC%89"><span class="toc-number">5.</span> <span class="toc-text">⑤ 如何保证数据安全性（Safety）</span></a></li></ol></div><!-- top--><i class="fa fa-arrow-up close" id="go-up" aria-hidden="true"></i></body></html>
