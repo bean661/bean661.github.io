@@ -97,7 +97,7 @@
   }
 }( typeof global !== "undefined" ? global : this ) );</script><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" defer></script><script src="/js/main.js?v=2018.7.9" defer></script><!-- fancybox--><link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" defer></script><!-- busuanzi--><script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script><meta name="generator" content="Hexo 6.3.0"></head><body><section class="profile-close" id="cxo-profile"><div class="profile-avatar"><i class="fa fa-caret-left"></i><img src="https://raw.githubusercontent.com/bean661/images/main/img/202303272339548.jpg"></div><!--.profile-saying
   i.fa.fa-comment
-  .saying--><div class="cxo-profile-inner"><div class="profile-name">Bean</div><div class="profile-signature">for me</div><div class="friends"><div>FRIENDS</div><span><a href="https://www.happyshark.cn/" target="_black">AChao</a></span></div><div class="read-progress"></div></div></section><header id="cxo-intro" style="height: 70vh;background-image: url(/img/intro/index-bg.png);"><nav id="cxo-intro-nav"><section><div class="intro-nav-title"><a href="/">Mr.Bean's Blog</a></div><div class="intro-nav-label-box"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div><i class="fa fa-bars intro-nav-menu"><div class="intro-nav-drop"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div></i><div class="clear"></div></section></nav><h1 class="post-title">eureka和nacos以及zookeeper的区别</h1><div class="post-intros"><div class="post-intro-meta"><span class="post-intro-time"><i class="post-intro-calendar fa fa-edit"></i><span>2023-12-23</span></span><span class="post-intro-tags"><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="分布式"> 分布式</a><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="注册中心"> 注册中心</a><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="配置中心"> 配置中心</a></span></div><div class="post-intro-read"><span> Word count: <span class="post-count">903</span> | Reading time: <span class="post-count">3</span>min</span></div></div></header><article class="cxo-up" id="cxo-content-outer"><section id="cxo-content-inner"><article class="article-entry" id="post"><h1 id="注册中心基本概念"><a href="#注册中心基本概念" class="headerlink" title="注册中心基本概念"></a>注册中心基本概念</h1><h3 id="什么是注册中心？"><a href="#什么是注册中心？" class="headerlink" title="什么是注册中心？"></a>什么是注册中心？</h3><p>注册中心主要有三种角色：</p>
+  .saying--><div class="cxo-profile-inner"><div class="profile-name">Bean</div><div class="profile-signature">for me</div><div class="friends"><div>FRIENDS</div><span><a href="https://www.happyshark.cn/" target="_black">AChao</a></span></div><div class="read-progress"></div></div></section><header id="cxo-intro" style="height: 70vh;background-image: url(/img/intro/index-bg.png);"><nav id="cxo-intro-nav"><section><div class="intro-nav-title"><a href="/">Mr.Bean's Blog</a></div><div class="intro-nav-label-box"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div><i class="fa fa-bars intro-nav-menu"><div class="intro-nav-drop"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div></i><div class="clear"></div></section></nav><h1 class="post-title">eureka和nacos以及zookeeper的区别</h1><div class="post-intros"><div class="post-intro-meta"><span class="post-intro-time"><i class="post-intro-calendar fa fa-edit"></i><span>2023-12-23</span></span><span class="post-intro-tags"><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="分布式"> 分布式</a><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="注册中心"> 注册中心</a><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="配置中心"> 配置中心</a></span></div><div class="post-intro-read"><span> Word count: <span class="post-count">4k</span> | Reading time: <span class="post-count">14</span>min</span></div></div></header><article class="cxo-up" id="cxo-content-outer"><section id="cxo-content-inner"><article class="article-entry" id="post"><h1 id="注册中心基本概念"><a href="#注册中心基本概念" class="headerlink" title="注册中心基本概念"></a>注册中心基本概念</h1><h3 id="什么是注册中心？"><a href="#什么是注册中心？" class="headerlink" title="什么是注册中心？"></a>什么是注册中心？</h3><p>注册中心主要有三种角色：</p>
 <ul>
 <li><p><strong>服务提供者（RPC Server）</strong>：在启动时，向 Registry 注册自身服务，并向 Registry 定期发送心跳汇报存活状态。</p>
 </li>
@@ -132,4 +132,123 @@
 <p>Raft是Paxos的简化版，与Paxos相比，Raft强调的是易理解、易实现，Raft和Paxos一样只要保证超过半数的节点正常就能够提供服务。这篇文章 <a target="_blank" rel="noopener" href="https://so.csdn.net/so/search?q=%E3%80%8AETCD%E6%95%99%E7%A8%8B-2.Raft%E5%8D%8F%E8%AE%AE%E3%80%8B">《ETCD教程-2.Raft协议》</a> 详细讲解了Raft原理，非常有意思，感兴趣的同学可以看看。</p>
 <p><a target="_blank" rel="noopener" href="https://so.csdn.net/so/search?q=ZooKeeper&spm=1001.2101.3001.7020">ZooKeeper</a> Atomic Broadcast (ZAB, ZooKeeper原子消息广播协议)是ZooKeeper实现分布式数据一致性的核心算法，ZAB借鉴Paxos算法，但又不像Paxos算法那样，是一种通用的分布式一致性算法，它是一种特别为ZooKeeper专门设计的支持崩溃恢复的原子广播协议。 </p>
 <p>raft和zab协议具体的介绍参考另外两篇文章</p>
-</article><!-- lincense--><div class="license-wrapper"><p> <span>Author:  </span><a href="http://example.com">Bean</a></p><p> <span>Link:  </span><a href="http://example.com/2023/12/23/eureka%E5%92%8Cnacos%E4%BB%A5%E5%8F%8Azookeeper%E7%9A%84%E5%8C%BA%E5%88%AB/">http://example.com/2023/12/23/eureka%E5%92%8Cnacos%E4%BB%A5%E5%8F%8Azookeeper%E7%9A%84%E5%8C%BA%E5%88%AB/</a></p><p> <span>Copyright:  </span><span>All articles in this blog are licensed under <a rel="license noopener" target="_blank" href="https://creativecommons.org/licenses/by-nc-nd/3.0">CC BY-NC-SA 3.0</a> unless stating additionally.</span></p></div><div class="post-paginator"><a class="prevSlogan" href="/2023/12/23/raft%E7%AE%97%E6%B3%95/" title="raft算法"><span>< PreviousPost</span><br><span class="prevTitle">raft算法</span></a><a class="nextSlogan" href="/2023/12/20/%E4%BA%8B%E5%8A%A1%E4%B8%8D%E5%9B%9E%E6%BB%9A/" title="spring事务失效 事务不回滚回滚"><span>NextPost ></span><br><span class="nextTitle">spring事务失效 事务不回滚回滚</span></a><div class="clear"></div></div><div id="comment"><div id="SOHUCS" sid="/2023/12/23/eureka%E5%92%8Cnacos%E4%BB%A5%E5%8F%8Azookeeper%E7%9A%84%E5%8C%BA%E5%88%AB/"></div><script charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/changyan.js"></script><script>window.changyan.api.config({appid: 'cywUFG3US', conf: '5069ff4a80c8ae40509708fb69d6f29e'});</script></div></section></article><footer id="cxo-footer-outer"><div id="cxo-footer-inner"><p class="footer-container"><span>Site by </span><a target="_blank" rel="noopener" href="http://hexo.io"><span>Hexo</span></a><span> | theme </span><a target="_blank" rel="noopener" href="https://github.com/Longlongyu/hexo-theme-Cxo"><span>Cxo</span></a></p><i class="fa fa-user"> </i><span id="busuanzi_value_site_uv"></span><span> | </span><i class="fa fa-eye"> </i><span id="busuanzi_value_site_pv"></span></div></footer><!-- catelog--><div class="toc-wrapper" style="top: 70vh;"><div class="toc-catalog"><i class="fa fa-list"> </i><span>CATALOG</span></div><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%B3%A8%E5%86%8C%E4%B8%AD%E5%BF%83%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="toc-number">1.</span> <span class="toc-text">注册中心基本概念</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E6%B3%A8%E5%86%8C%E4%B8%AD%E5%BF%83%EF%BC%9F"><span class="toc-number">1.0.1.</span> <span class="toc-text">什么是注册中心？</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#CAP%E7%90%86%E8%AE%BA"><span class="toc-number">2.</span> <span class="toc-text">CAP理论</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F%E5%8D%8F%E8%AE%AE"><span class="toc-number">3.</span> <span class="toc-text">分布式系统协议</span></a></li></ol></div><!-- top--><i class="fa fa-arrow-up close" id="go-up" aria-hidden="true"></i></body></html>
+<h1 id="ZooKeeper"><a href="#ZooKeeper" class="headerlink" title="ZooKeeper"></a>ZooKeeper</h1><p>在常用的开发集群环境中，ZooKeeper依然起到十分重要的作用，Java体系中，大部分的集群环境都是依赖ZooKeeper管理服务的各个节点。</p>
+<p><img src="https://raw.githubusercontent.com/bean661/images/main/img/msedge_7yd7QREgFa.png"></p>
+<p>Zookeeper可以充当一个服务注册表（Service Registry），让多个服务提供者形成一个集群，让服务消费者通过服务注册表获取具体的服务访问地址（Ip+端口）去访问具体的服务提供者。</p>
+<p><img src="https://raw.githubusercontent.com/bean661/images/main/img/msedge_GFpcdOeudO.png"></p>
+<p>在zookeeper中，进行服务注册，实际上就是在zookeeper中创建了一个znode节点，该节点存储了该服务的IP、端口、调用方式(协议、序列化方式)等。该节点承担着最重要的职责，它由服务提供者(发布服务时)创建，以供服务消费者获取节点中的信息，从而定位到服务提供者真正网络拓扑位置以及得知如何调用。</p>
+<p><strong>RPC服务注册&#x2F;发现过程简述如下：</strong></p>
+<ol>
+<li><p>服务提供者启动时，会将其服务名称，ip地址注册到配置中心。</p>
+</li>
+<li><p>服务消费者在第一次调用服务时，会通过注册中心找到相应的服务的IP地址列表，并缓存到本地，以供后续使用。当消费者调用服务时，不会再去请求注册中心，而是直接通过负载均衡算法从IP列表中取一个服务提供者的服务器调用服务。</p>
+</li>
+<li><p>当服务提供者的某台服务器宕机或下线时，相应的ip会从服务提供者IP列表中移除。同时，注册中心会将新的服务IP地址列表发送给服务消费者机器，缓存在消费者本机。</p>
+</li>
+<li><p>当某个服务的所有服务器都下线了，那么这个服务也就下线了。</p>
+</li>
+<li><p>同样，当服务提供者的某台服务器上线时，注册中心会将新的服务IP地址列表发送给服务消费者机器，缓存在消费者本机。</p>
+</li>
+<li><p>服务提供方可以根据服务消费者的数量来作为服务下线的依据。</p>
+</li>
+</ol>
+<p>zookeeper提供了“心跳检测”功能：<strong>它会定时向各个服务提供者发送一个请求（实际上建立的是一个 socket 长连接），如果长期没有响应，服务中心就认为该服务提供者已经“挂了”，并将其剔除。</strong></p>
+<p>Zookeeper的Watch机制其实就是一种<strong>推拉结合的模式</strong>：</p>
+<ul>
+<li><p>服务消费者会去监听相应路径（&#x2F;HelloWorldService&#x2F;1.0.0），一旦路径上的数据有任务变化（增加或减少），<strong>Zookeeper只会发送一个事件类型和节点信息给关注的客户端，而不会包括具体的变更内容</strong>，所以事件本身是轻量级的，这就是推的部分。</p>
+</li>
+<li><p><strong>收到变更通知的客户端需要自己去拉变更的数据</strong>，这就是拉的部分。</p>
+</li>
+</ul>
+<h4 id="Zookeeper不适合作为注册中心"><a href="#Zookeeper不适合作为注册中心" class="headerlink" title="Zookeeper不适合作为注册中心"></a>Zookeeper不适合作为注册中心</h4><p>作为一个分布式协同服务，ZooKeeper非常好，但是对于Service发现服务来说就不合适了，因为对于Service发现服务来说就算是返回了包含不实的信息的结果也比什么都不返回要好。<strong>所以当向注册中心查询服务列表时，我们可以容忍注册中心返回的是几分钟以前的注册信息，但不能接受服务直接down掉不可用。</strong></p>
+<p>但是zk会出现这样一种情况，当master节点因为网络故障与其他节点失去联系时，剩余节点会重新进行leader选举。问题在于，选举leader的时间太长，30 ~ 120s, 且选举期间整个zk集群都是不可用的，这就导致在选举期间注册服务瘫痪。在云部署的环境下，因网络问题使得zk集群失去master节点是较大概率会发生的事，虽然服务能够最终恢复，但是漫长的选举时间导致的注册长期不可用是不能容忍的。</p>
+<p>所以说，<strong>作为注册中心，可用性的要求要高于一致性！</strong></p>
+<p>在 CAP 模型中，<strong>Zookeeper整体遵循一致性（CP）原则</strong>，即在任何时候对 Zookeeper 的访问请求能得到一致的数据结果，但是当机器下线或者宕机时，<strong>不能保证服务可用性。</strong></p>
+<p>那为什么Zookeeper不使用最终一致性（AP）模型呢？因为这个依赖<strong>Zookeeper的核心算法是ZAB，所有设计都是为了强一致性</strong>。这个对于分布式协调系统，完全没没有毛病，但是<strong>你如果将Zookeeper为分布式协调服务所做的一致性保障，用在注册中心，或者说服务发现场景，这个其实就不合适。</strong></p>
+<h1 id="Eureka"><a href="#Eureka" class="headerlink" title="Eureka"></a>Eureka</h1><h4 id="Eureka-特点"><a href="#Eureka-特点" class="headerlink" title="Eureka 特点"></a>Eureka 特点</h4><ul>
+<li><p><strong>可用性（AP原则）</strong>：Eureka 在设计时就紧遵AP原则，Eureka的集群中，只要有一台Eureka还在，就能保证注册服务可用，只不过查到的信息可能不是最新的（不保证强一致性）。</p>
+</li>
+<li><p><strong>去中心化架构</strong>：Eureka Server 可以运行多个实例来构建集群，不同于 ZooKeeper 的选举 leader 的过程，Eureka Server 采用的是Peer to Peer 对等通信。这是一种去中心化的架构，无 master&#x2F;slave 之分，每一个 Peer 都是对等的。节点通过彼此互相注册来提高可用性，每个节点需要添加一个或多个有效的 serviceUrl 指向其他节点。每个节点都可被视为其他节点的副本。</p>
+</li>
+<li><p><strong>请求自动切换</strong>：在集群环境中如果某台 Eureka Server 宕机，Eureka Client 的请求会自动切换到新的 Eureka Server 节点上，当宕机的服务器重新恢复后，Eureka 会再次将其纳入到服务器集群管理之中。</p>
+</li>
+<li><p><strong>节点间操作复制</strong>：当节点开始接受客户端请求时，所有的操作都会在节点间进行复制操作，将请求复制到该 Eureka Server 当前所知的其它所有节点中。</p>
+</li>
+<li><p><strong>自动注册&amp;心跳</strong>：当一个新的 Eureka Server 节点启动后，会首先尝试从邻近节点获取所有注册列表信息，并完成初始化。Eureka Server 通过 getEurekaServiceUrls() 方法获取所有的节点，并且会通过心跳契约的方式定期更新。</p>
+</li>
+<li><p><strong>自动下线</strong>：默认情况下，如果 Eureka Server 在一定时间内没有接收到某个服务实例的心跳（默认周期为30秒），Eureka Server 将会注销该实例（默认为90秒， eureka.instance.lease-expiration-duration-in-seconds 进行自定义配置）。</p>
+</li>
+<li><p><strong>保护模式</strong>：当 Eureka Server 节点在短时间内丢失过多的心跳时，那么这个节点就会进入自我保护模式。</p>
+</li>
+</ul>
+<p>除了上述特点，Eureka还有一种自我保护机制，如果在15分钟内超过 <strong>85%</strong> 的节点都没有正常的心跳，那么Eureka就认为客户端与注册中心出现了网络故障，此时会出现以下几种情况：</p>
+<ul>
+<li><p>Eureka不再从注册表中移除因为长时间没有收到心跳而过期的服务；</p>
+</li>
+<li><p>Eureka仍然能够接受新服务注册和查询请求，但是不会被同步到其它节点上（即保证当前节点依然可用）</p>
+</li>
+<li><p>当网络稳定时，当前实例新注册的信息会被同步到其它节点中。</p>
+</li>
+</ul>
+<h4 id="Eureka工作流程"><a href="#Eureka工作流程" class="headerlink" title="Eureka工作流程"></a>Eureka工作流程</h4><p>了解完 Eureka 核心概念，自我保护机制，以及集群内的工作原理后，我们来整体梳理一下 Eureka 的工作流程：</p>
+<ol>
+<li><p>Eureka Server 启动成功，等待服务端注册。在启动过程中如果配置了集群，集群之间定时通过 Replicate 同步注册表，每个 Eureka Server 都存在独立完整的服务注册表信息。</p>
+</li>
+<li><p>Eureka Client 启动时根据配置的 Eureka Server 地址去注册中心注册服务。</p>
+</li>
+<li><p>Eureka Client 会每 30s 向 Eureka Server 发送一次心跳请求，证明客户端服务正常。</p>
+</li>
+<li><p>当 Eureka Server 90s 内没有收到 Eureka Client 的心跳，注册中心则认为该节点失效，会注销该实例。</p>
+</li>
+<li><p>单位时间内 Eureka Server 统计到有大量的 Eureka Client 没有上送心跳，则认为可能为网络异常，进入自我保护机制，不再剔除没有上送心跳的客户端。</p>
+</li>
+<li><p>当 Eureka Client 心跳请求恢复正常之后，Eureka Server 自动退出自我保护模式。</p>
+</li>
+<li><p>Eureka Client 定时全量或者增量从注册中心获取服务注册表，并且将获取到的信息缓存到本地。</p>
+</li>
+<li><p>服务调用时，Eureka Client 会先从本地缓存找寻调取的服务。如果获取不到，先从注册中心刷新注册表，再同步到本地缓存。</p>
+</li>
+<li><p>Eureka Client 获取到目标服务器信息，发起服务调用。</p>
+</li>
+<li><p>Eureka Client 程序关闭时向 Eureka Server 发送取消请求，Eureka Server 将实例从注册表中删除。</p>
+</li>
+</ol>
+<h1 id="Nacos"><a href="#Nacos" class="headerlink" title="Nacos"></a>Nacos</h1><h4 id="Nacos-主要特点"><a href="#Nacos-主要特点" class="headerlink" title="Nacos 主要特点"></a>Nacos 主要特点</h4><p><strong>服务发现和服务健康监测</strong>：</p>
+<ul>
+<li><p>Nacos 支持基于 DNS 和基于 RPC 的服务发现。服务提供者使用原生SDK、OpenAPI、或一个独立的Agent TODO注册 Service 后，服务消费者可以使用DNS TODO 或HTTP&amp;API查找和发现服务。</p>
+</li>
+<li><p>Nacos 提供对服务的实时的健康检查，阻止向不健康的主机或服务实例发送请求。Nacos 支持传输层 (PING 或 TCP)和应用层 (如 HTTP、MySQL、用户自定义）的健康检查。对于复杂的云环境和网络拓扑环境中（如 VPC、边缘网络等）服务的健康检查，Nacos 提供了 agent 上报模式和服务端主动检测2种健康检查模式。Nacos 还提供了统一的健康检查仪表盘，帮助您根据健康状态管理服务的可用性及流量。</p>
+</li>
+</ul>
+<p><strong>动态配置服务</strong>：</p>
+<ul>
+<li><p>动态配置服务可以让您以中心化、外部化和动态化的方式管理所有环境的应用配置和服务配置。</p>
+</li>
+<li><p>动态配置消除了配置变更时重新部署应用和服务的需要，让配置管理变得更加高效和敏捷。</p>
+</li>
+<li><p>配置中心化管理让实现无状态服务变得更简单，让服务按需弹性扩展变得更容易。</p>
+</li>
+<li><p>Nacos 提供了一个简洁易用的UI (控制台样例 Demo) 帮助您管理所有的服务和应用的配置。Nacos 还提供包括配置版本跟踪、金丝雀发布、一键回滚配置以及客户端配置更新状态跟踪在内的一系列开箱即用的配置管理特性，帮助您更安全地在生产环境中管理配置变更和降低配置变更带来的风险。</p>
+</li>
+</ul>
+<p><strong>动态 DNS 服务</strong>：</p>
+<ul>
+<li><p>动态 DNS 服务支持权重路由，让您更容易地实现中间层负载均衡、更灵活的路由策略、流量控制以及数据中心内网的简单DNS解析服务。动态DNS服务还能让您更容易地实现以 DNS 协议为基础的服务发现，以帮助您消除耦合到厂商私有服务发现 API 上的风险。</p>
+</li>
+<li><p>Nacos 提供了一些简单的 DNS APIs TODO 帮助您管理服务的关联域名和可用的 IP:PORT 列表。</p>
+</li>
+</ul>
+<blockquote>
+<p>小节一下：</p>
+<ul>
+<li><p>Nacos是阿里开源的，支持基于 DNS 和基于 RPC 的服务发现。</p>
+</li>
+<li><p><strong>Nacos的注册中心支持CP也支持AP</strong>，对他来说只是一个命令的切换，随你玩，还支持各种注册中心迁移到Nacos，反正一句话，只要你想要的他就有。</p>
+</li>
+<li><p><strong>Nacos除了服务的注册发现之外，还支持动态配置服务</strong>，一句话概括就是<strong>Nacos &#x3D; Spring Cloud注册中心 + Spring Cloud配置中心</strong>。</p>
+</li>
+</ul>
+</blockquote>
+<h1 id="nacos、eureka的区别"><a href="#nacos、eureka的区别" class="headerlink" title="nacos、eureka的区别"></a>nacos、eureka的区别</h1><p>① Nacos支持服务端主动检测提供者状态：临时实例采用心跳模式，非临时实例<br>采用主动检测模式<br>② 临时实例心跳不正常会被剔除，非临时实例则不会被剔除<br>③ Nacos支持服务列表变更的消息推送模式，服务列表更新更及时<br>④ Nacos集群默认采用AP方式，当集群中存在非临时实例时，采用CP模式；</p>
+<p>总结：<br>Eureka采用AP方式<br>naocs默认是AP模式，可以采用CP模式</p>
+</article><!-- lincense--><div class="license-wrapper"><p> <span>Author:  </span><a href="http://example.com">Bean</a></p><p> <span>Link:  </span><a href="http://example.com/2023/12/23/eureka%E5%92%8Cnacos%E4%BB%A5%E5%8F%8Azookeeper%E7%9A%84%E5%8C%BA%E5%88%AB/">http://example.com/2023/12/23/eureka%E5%92%8Cnacos%E4%BB%A5%E5%8F%8Azookeeper%E7%9A%84%E5%8C%BA%E5%88%AB/</a></p><p> <span>Copyright:  </span><span>All articles in this blog are licensed under <a rel="license noopener" target="_blank" href="https://creativecommons.org/licenses/by-nc-nd/3.0">CC BY-NC-SA 3.0</a> unless stating additionally.</span></p></div><div class="post-paginator"><a class="prevSlogan" href="/2023/12/23/raft%E7%AE%97%E6%B3%95/" title="raft算法"><span>< PreviousPost</span><br><span class="prevTitle">raft算法</span></a><a class="nextSlogan" href="/2023/12/20/%E4%BA%8B%E5%8A%A1%E4%B8%8D%E5%9B%9E%E6%BB%9A/" title="spring事务失效 事务不回滚回滚"><span>NextPost ></span><br><span class="nextTitle">spring事务失效 事务不回滚回滚</span></a><div class="clear"></div></div><div id="comment"><div id="SOHUCS" sid="/2023/12/23/eureka%E5%92%8Cnacos%E4%BB%A5%E5%8F%8Azookeeper%E7%9A%84%E5%8C%BA%E5%88%AB/"></div><script charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/changyan.js"></script><script>window.changyan.api.config({appid: 'cywUFG3US', conf: '5069ff4a80c8ae40509708fb69d6f29e'});</script></div></section></article><footer id="cxo-footer-outer"><div id="cxo-footer-inner"><p class="footer-container"><span>Site by </span><a target="_blank" rel="noopener" href="http://hexo.io"><span>Hexo</span></a><span> | theme </span><a target="_blank" rel="noopener" href="https://github.com/Longlongyu/hexo-theme-Cxo"><span>Cxo</span></a></p><i class="fa fa-user"> </i><span id="busuanzi_value_site_uv"></span><span> | </span><i class="fa fa-eye"> </i><span id="busuanzi_value_site_pv"></span></div></footer><!-- catelog--><div class="toc-wrapper" style="top: 70vh;"><div class="toc-catalog"><i class="fa fa-list"> </i><span>CATALOG</span></div><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%B3%A8%E5%86%8C%E4%B8%AD%E5%BF%83%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="toc-number">1.</span> <span class="toc-text">注册中心基本概念</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E6%B3%A8%E5%86%8C%E4%B8%AD%E5%BF%83%EF%BC%9F"><span class="toc-number">1.0.1.</span> <span class="toc-text">什么是注册中心？</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#CAP%E7%90%86%E8%AE%BA"><span class="toc-number">2.</span> <span class="toc-text">CAP理论</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F%E5%8D%8F%E8%AE%AE"><span class="toc-number">3.</span> <span class="toc-text">分布式系统协议</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#ZooKeeper"><span class="toc-number">4.</span> <span class="toc-text">ZooKeeper</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Zookeeper%E4%B8%8D%E9%80%82%E5%90%88%E4%BD%9C%E4%B8%BA%E6%B3%A8%E5%86%8C%E4%B8%AD%E5%BF%83"><span class="toc-number">4.0.0.1.</span> <span class="toc-text">Zookeeper不适合作为注册中心</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Eureka"><span class="toc-number">5.</span> <span class="toc-text">Eureka</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Eureka-%E7%89%B9%E7%82%B9"><span class="toc-number">5.0.0.1.</span> <span class="toc-text">Eureka 特点</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Eureka%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%A8%8B"><span class="toc-number">5.0.0.2.</span> <span class="toc-text">Eureka工作流程</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Nacos"><span class="toc-number">6.</span> <span class="toc-text">Nacos</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Nacos-%E4%B8%BB%E8%A6%81%E7%89%B9%E7%82%B9"><span class="toc-number">6.0.0.1.</span> <span class="toc-text">Nacos 主要特点</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#nacos%E3%80%81eureka%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="toc-number">7.</span> <span class="toc-text">nacos、eureka的区别</span></a></li></ol></div><!-- top--><i class="fa fa-arrow-up close" id="go-up" aria-hidden="true"></i></body></html>
