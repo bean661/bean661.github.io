@@ -1,0 +1,109 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"><meta name="author" content="Bean"><meta name="renderer" content="webkit"><meta name="copyright" content="Bean"><meta name="keywords" content="Hexo"><meta name="description" content=""><meta name="Cache-Control" content="no-cache"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><title>Redis的常用据类型 · Mr.Bean's Blog</title><link rel="stylesheet" href="/css/style.css?v=2018.7.9"><link rel="stylesheet" href="/css/animation.css?v=2018.7.9"><link rel="icon" href="/img/assets/favicon.ico"><link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css?version=1.5.6"><!-- scripts--><script>(function( w ){
+  "use strict";
+  // rel=preload support test
+  if( !w.loadCSS ){
+    w.loadCSS = function(){};
+  }
+  // define on the loadCSS obj
+  var rp = loadCSS.relpreload = {};
+  // rel=preload feature support test
+  // runs once and returns a function for compat purposes
+  rp.support = (function(){
+    var ret;
+    try {
+      ret = w.document.createElement( "link" ).relList.supports( "preload" );
+    } catch (e) {
+      ret = false;
+    }
+    return function(){
+      return ret;
+    };
+  })();
+
+  // if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+  // then change that media back to its intended value on load
+  rp.bindMediaToggle = function( link ){
+    // remember existing media attr for ultimate state, or default to 'all'
+    var finalMedia = link.media || "all";
+
+    function enableStylesheet(){
+      link.media = finalMedia;
+    }
+
+    // bind load handlers to enable media
+    if( link.addEventListener ){
+      link.addEventListener( "load", enableStylesheet );
+    } else if( link.attachEvent ){
+      link.attachEvent( "onload", enableStylesheet );
+    }
+
+    // Set rel and non-applicable media type to start an async request
+    // note: timeout allows this to happen async to let rendering continue in IE
+    setTimeout(function(){
+      link.rel = "stylesheet";
+      link.media = "only x";
+    });
+    // also enable media after 3 seconds,
+    // which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+    setTimeout( enableStylesheet, 3000 );
+  };
+
+  // loop through link elements in DOM
+  rp.poly = function(){
+    // double check this to prevent external calls from running
+    if( rp.support() ){
+      return;
+    }
+    var links = w.document.getElementsByTagName( "link" );
+    for( var i = 0; i < links.length; i++ ){
+      var link = links[ i ];
+      // qualify links to those with rel=preload and as=style attrs
+      if( link.rel === "preload" && link.getAttribute( "as" ) === "style" && !link.getAttribute( "data-loadcss" ) ){
+        // prevent rerunning on link
+        link.setAttribute( "data-loadcss", true );
+        // bind listeners to toggle media back
+        rp.bindMediaToggle( link );
+      }
+    }
+  };
+
+  // if unsupported, run the polyfill
+  if( !rp.support() ){
+    // run once at least
+    rp.poly();
+
+    // rerun poly on an interval until onload
+    var run = w.setInterval( rp.poly, 500 );
+    if( w.addEventListener ){
+      w.addEventListener( "load", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    } else if( w.attachEvent ){
+      w.attachEvent( "onload", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    }
+  }
+
+
+  // commonjs
+  if( typeof exports !== "undefined" ){
+    exports.loadCSS = loadCSS;
+  }
+  else {
+    w.loadCSS = loadCSS;
+  }
+}( typeof global !== "undefined" ? global : this ) );</script><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" defer></script><script src="/js/main.js?v=2018.7.9" defer></script><!-- fancybox--><link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" defer></script><!-- busuanzi--><script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script><meta name="generator" content="Hexo 6.3.0"></head><body><section class="profile-close" id="cxo-profile"><div class="profile-avatar"><i class="fa fa-caret-left"></i><img src="https://raw.githubusercontent.com/bean661/images/main/img/202303272339548.jpg"></div><!--.profile-saying
+  i.fa.fa-comment
+  .saying--><div class="cxo-profile-inner"><div class="profile-name">Bean</div><div class="profile-signature">for me</div><div class="friends"><div>FRIENDS</div><span><a href="https://www.happyshark.cn/" target="_black">AChao</a></span></div><div class="read-progress"></div></div></section><header id="cxo-intro" style="height: 70vh;background-image: url(/img/intro/index-bg.png);"><nav id="cxo-intro-nav"><section><div class="intro-nav-title"><a href="/">Mr.Bean's Blog</a></div><div class="intro-nav-label-box"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div><i class="fa fa-bars intro-nav-menu"><div class="intro-nav-drop"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div></i><div class="clear"></div></section></nav><h1 class="post-title">Redis的常用据类型</h1><div class="post-intros"><div class="post-intro-meta"><span class="post-intro-time"><i class="post-intro-calendar fa fa-edit"></i><span>2023-12-24</span></span><span class="post-intro-tags"><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="Redis"> Redis</a></span></div><div class="post-intro-read"><span> Word count: <span class="post-count">902</span> | Reading time: <span class="post-count">3</span>min</span></div></div></header><article class="cxo-up" id="cxo-content-outer"><section id="cxo-content-inner"><article class="article-entry" id="post"><h3 id="Redis的常用数据类型"><a href="#Redis的常用数据类型" class="headerlink" title="Redis的常用数据类型"></a>Redis的常用数据类型</h3><p>Redis是典型的“键值型”数据库，不同数据类型其key结构一致，value有所差异。常见的类型有：string、hash、list、set、SortedSet等。</p>
+<p>而基于以上5种基本数据类型，Redis又拓展了几种拓展类型，例如：BitMap、HyperLogLog、Geo等。</p>
+<h5 id="String类型"><a href="#String类型" class="headerlink" title="String类型"></a>String类型</h5><p>是Redis中最常见的数据类型，value与key一样都是Redis自定义的字符串结构，称为SDS。不过在保存数字、小字符串时因为采用INT和EMBSTR编码，内存结构紧凑，只需要申请一次内存分配，效率更高，更节省内存。<br>而超过44字节的大字符串时则需要采用RAW编码，申请额外的SDS空间，需要两次内存分配，效率较低，内存占用也较高，但最大不超过512mb，因此建议单个value尽量不要超过44字节。<br>String类型常用来做计数器、简单数据存储等。复杂数据建议采用其它数据结构。</p>
+<h5 id="Hash结构"><a href="#Hash结构" class="headerlink" title="Hash结构"></a>Hash结构</h5><p>其value与Java中的HashMap类似，有是一个key-value结构。如果有一个对象需要被Redis缓存，而且将来可能有部分修改。建议用hash结构来存储这个对象的每一个字段和字段值。而不是作为一个JSON字符串存储到String类型中。因为Hash结构的每一个字段都可以单独做修改，而String的JSON串必须整体覆盖</p>
+<p>与Java中的hashMap不同的是，Redis中的Hash底层采用了渐进式rehash的算法，在做rehash时会创建一个新的hashtable，每次操作元素时移动一部分数据，只到所有数据迁移完成，再用新的HashTable来代替旧的，避免了因为rehash导致的阻塞，因此性能更高。</p>
+<h5 id="List结构"><a href="#List结构" class="headerlink" title="List结构"></a>List结构</h5><p>List结构的value类型可以看做是一个双端链表，提供了一些命令便于我们从首尾操作元素。为了节省内存空间，底层采用了ZipList（压缩列表）来做基础存储。当压缩列表数据达到阈值（512）则会创建新的压缩列表。每个压缩列表作为一个双端链表的一个节点，最终形成一个QuickList结构。而且QuickList结构与一般的双端链表不同，他可以对中间不常用的ZipList节点做压缩以节省内存。</p>
+<p>List结构常用来模拟队列，实现任务排队这样的功能。</p>
+<h5 id="Set结构"><a href="#Set结构" class="headerlink" title="Set结构"></a>Set结构</h5><p>Set结构的value与Java的Set类似，元素不可重复。Redis提供了求交集、并集等命令，可以帮助我们实现例如：好友列表、共同好友等功能。<br>当存储元素是整数时，其底层默认采用IntSet结构，可以看做是一个有序的数组，结构紧凑，效率较高。而元素如果不是整数，或者元素量超过512这个阈值时则会转为hash表结构，内存占用会有大的增加。因此我们在使用Set结构时尽量采用数组存储，例如数值类型的id。而且元素数量尽量不要超过512，避免出现BigKey。</p>
+<h5 id="SortedSet"><a href="#SortedSet" class="headerlink" title="SortedSet"></a>SortedSet</h5><p>也叫ZSet。其value就是一个有序的Set集合，元素唯一，并且会按照一个指定的score值排序。因此常用来做排行榜功能。<br>SortedSet底层的利用Hash表保证元素的唯一性。利用跳表（SkipList）来保证元素的有序性，因此数据会有重复存储，内存占用较高，是一种典型的以空间换时间的设计。不建议在SortedSet中放入过多数据。</p>
+</article><!-- lincense--><div class="license-wrapper"><p> <span>Author:  </span><a href="http://example.com">Bean</a></p><p> <span>Link:  </span><a href="http://example.com/2023/12/24/Redis%E7%9A%84%E5%B8%B8%E7%94%A8%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B/">http://example.com/2023/12/24/Redis%E7%9A%84%E5%B8%B8%E7%94%A8%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B/</a></p><p> <span>Copyright:  </span><span>All articles in this blog are licensed under <a rel="license noopener" target="_blank" href="https://creativecommons.org/licenses/by-nc-nd/3.0">CC BY-NC-SA 3.0</a> unless stating additionally.</span></p></div><div class="post-paginator"><a class="nextSlogan" href="/2023/12/24/SpringBoot%E8%87%AA%E5%8A%A8%E8%A3%85%E9%85%8D%E7%9A%84%E5%8E%9F%E7%90%86/" title="SpringBoot自动装配的原理"><span>NextPost ></span><br><span class="nextTitle">SpringBoot自动装配的原理</span></a><div class="clear"></div></div><div id="comment"><div id="SOHUCS" sid="/2023/12/24/Redis%E7%9A%84%E5%B8%B8%E7%94%A8%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B/"></div><script charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/changyan.js"></script><script>window.changyan.api.config({appid: 'cywUFG3US', conf: '5069ff4a80c8ae40509708fb69d6f29e'});</script></div></section></article><footer id="cxo-footer-outer"><div id="cxo-footer-inner"><p class="footer-container"><span>Site by </span><a target="_blank" rel="noopener" href="http://hexo.io"><span>Hexo</span></a><span> | theme </span><a target="_blank" rel="noopener" href="https://github.com/Longlongyu/hexo-theme-Cxo"><span>Cxo</span></a></p><i class="fa fa-user"> </i><span id="busuanzi_value_site_uv"></span><span> | </span><i class="fa fa-eye"> </i><span id="busuanzi_value_site_pv"></span></div></footer><!-- catelog--><div class="toc-wrapper" style="top: 70vh;"><div class="toc-catalog"><i class="fa fa-list"> </i><span>CATALOG</span></div><ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#Redis%E7%9A%84%E5%B8%B8%E7%94%A8%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B"><span class="toc-number">1.</span> <span class="toc-text">Redis的常用数据类型</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#String%E7%B1%BB%E5%9E%8B"><span class="toc-number">1.0.1.</span> <span class="toc-text">String类型</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#Hash%E7%BB%93%E6%9E%84"><span class="toc-number">1.0.2.</span> <span class="toc-text">Hash结构</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#List%E7%BB%93%E6%9E%84"><span class="toc-number">1.0.3.</span> <span class="toc-text">List结构</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#Set%E7%BB%93%E6%9E%84"><span class="toc-number">1.0.4.</span> <span class="toc-text">Set结构</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#SortedSet"><span class="toc-number">1.0.5.</span> <span class="toc-text">SortedSet</span></a></li></ol></li></ol></li></ol></div><!-- top--><i class="fa fa-arrow-up close" id="go-up" aria-hidden="true"></i></body></html>
