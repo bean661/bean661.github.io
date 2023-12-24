@@ -1,0 +1,107 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"><meta name="author" content="Bean"><meta name="renderer" content="webkit"><meta name="copyright" content="Bean"><meta name="keywords" content="Hexo"><meta name="description" content=""><meta name="Cache-Control" content="no-cache"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><title>Redis主从同步 · Mr.Bean's Blog</title><link rel="stylesheet" href="/css/style.css?v=2018.7.9"><link rel="stylesheet" href="/css/animation.css?v=2018.7.9"><link rel="icon" href="/img/assets/favicon.ico"><link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css?version=1.5.6"><!-- scripts--><script>(function( w ){
+  "use strict";
+  // rel=preload support test
+  if( !w.loadCSS ){
+    w.loadCSS = function(){};
+  }
+  // define on the loadCSS obj
+  var rp = loadCSS.relpreload = {};
+  // rel=preload feature support test
+  // runs once and returns a function for compat purposes
+  rp.support = (function(){
+    var ret;
+    try {
+      ret = w.document.createElement( "link" ).relList.supports( "preload" );
+    } catch (e) {
+      ret = false;
+    }
+    return function(){
+      return ret;
+    };
+  })();
+
+  // if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+  // then change that media back to its intended value on load
+  rp.bindMediaToggle = function( link ){
+    // remember existing media attr for ultimate state, or default to 'all'
+    var finalMedia = link.media || "all";
+
+    function enableStylesheet(){
+      link.media = finalMedia;
+    }
+
+    // bind load handlers to enable media
+    if( link.addEventListener ){
+      link.addEventListener( "load", enableStylesheet );
+    } else if( link.attachEvent ){
+      link.attachEvent( "onload", enableStylesheet );
+    }
+
+    // Set rel and non-applicable media type to start an async request
+    // note: timeout allows this to happen async to let rendering continue in IE
+    setTimeout(function(){
+      link.rel = "stylesheet";
+      link.media = "only x";
+    });
+    // also enable media after 3 seconds,
+    // which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+    setTimeout( enableStylesheet, 3000 );
+  };
+
+  // loop through link elements in DOM
+  rp.poly = function(){
+    // double check this to prevent external calls from running
+    if( rp.support() ){
+      return;
+    }
+    var links = w.document.getElementsByTagName( "link" );
+    for( var i = 0; i < links.length; i++ ){
+      var link = links[ i ];
+      // qualify links to those with rel=preload and as=style attrs
+      if( link.rel === "preload" && link.getAttribute( "as" ) === "style" && !link.getAttribute( "data-loadcss" ) ){
+        // prevent rerunning on link
+        link.setAttribute( "data-loadcss", true );
+        // bind listeners to toggle media back
+        rp.bindMediaToggle( link );
+      }
+    }
+  };
+
+  // if unsupported, run the polyfill
+  if( !rp.support() ){
+    // run once at least
+    rp.poly();
+
+    // rerun poly on an interval until onload
+    var run = w.setInterval( rp.poly, 500 );
+    if( w.addEventListener ){
+      w.addEventListener( "load", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    } else if( w.attachEvent ){
+      w.attachEvent( "onload", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    }
+  }
+
+
+  // commonjs
+  if( typeof exports !== "undefined" ){
+    exports.loadCSS = loadCSS;
+  }
+  else {
+    w.loadCSS = loadCSS;
+  }
+}( typeof global !== "undefined" ? global : this ) );</script><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" defer></script><script src="/js/main.js?v=2018.7.9" defer></script><!-- fancybox--><link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" defer></script><!-- busuanzi--><script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script><meta name="generator" content="Hexo 6.3.0"></head><body><section class="profile-close" id="cxo-profile"><div class="profile-avatar"><i class="fa fa-caret-left"></i><img src="https://raw.githubusercontent.com/bean661/images/main/img/202303272339548.jpg"></div><!--.profile-saying
+  i.fa.fa-comment
+  .saying--><div class="cxo-profile-inner"><div class="profile-name">Bean</div><div class="profile-signature">for me</div><div class="friends"><div>FRIENDS</div><span><a href="https://www.happyshark.cn/" target="_black">AChao</a></span></div><div class="read-progress"></div></div></section><header id="cxo-intro" style="height: 70vh;background-image: url(/img/intro/index-bg.png);"><nav id="cxo-intro-nav"><section><div class="intro-nav-title"><a href="/">Mr.Bean's Blog</a></div><div class="intro-nav-label-box"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div><i class="fa fa-bars intro-nav-menu"><div class="intro-nav-drop"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div></i><div class="clear"></div></section></nav><h1 class="post-title">Redis主从同步</h1><div class="post-intros"><div class="post-intro-meta"><span class="post-intro-time"><i class="post-intro-calendar fa fa-edit"></i><span>2023-12-24</span></span><span class="post-intro-tags"><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="redis"> redis</a></span></div><div class="post-intro-read"><span> Word count: <span class="post-count">458</span> | Reading time: <span class="post-count">1</span>min</span></div></div></header><article class="cxo-up" id="cxo-content-outer"><section id="cxo-content-inner"><article class="article-entry" id="post"><h2 id="全量同步"><a href="#全量同步" class="headerlink" title="全量同步"></a>全量同步</h2><p>主从第一次同步是<strong>全量同步</strong></p>
+<p><img src="https://raw.githubusercontent.com/bean661/images/main/img/msedge_3PMD9HBfKK.png"></p>
+<p>第一阶段，全量同步流程<br>1.从节点执行replicaof命令，发送自己的replid和offset给主节点<br>2.主节点判断从节点的replid与自己的是否一致，<br>3.如果不一致说明是第一次来，需要做全量同步，主节点返回自己的replid给从节点<br>4.主节点开始执行bgsave，生成rdb文件<br>5.主节点发送rdb文件给从节点，再发送的过程中<br>6.从节点接收rdb文件，清空本地数据，加载rdb文件中的数据<br>7.同步过程中，主节点接收到的新命令写入从节点的写缓冲区(repl_buffer)<br>8.从节点接收到缓冲区数据后写入本地，并记录最新数据对应的offset<br>9.后期采用增量同步</p>
+<h2 id="增量同步"><a href="#增量同步" class="headerlink" title="增量同步"></a>增量同步</h2><p>后期数据变化后，则执行增量同步</p>
+<p><img src="https://raw.githubusercontent.com/bean661/images/main/img/msedge_nwREns5uW8.png"></p>
+<p>1.主节点会不断把自己接收到的命令记录在repl_baklog中，并修改offset<br>2.从节点向主节点发送psync命令，发送自己的offset和replid<br>3.主节点判断replid和offset与从节点是否一致<br>4.如果replid一致，说明是增量同步。然后判断offset是否一致<br>5.如果从节点offset小于主节点offset，并且在repl_baklog中能找到对应数据，则将offset之间相差的数据发送给从节点<br>6.从节点接收到数据后写入本地，修改自己的offset与主节点一致</p>
+<h4 id="增量同步的风险"><a href="#增量同步的风险" class="headerlink" title="增量同步的风险"></a>增量同步的风险</h4><p>repl_baklog大小有上限，写满后会覆盖最早的数据。如果slave断开时间过久，导致尚未备份的数据被覆盖，则无法基于log做增量同步，只能再次全量同步。<br>repl_baklog可以在配置文件中进行修改存储大小</p>
+</article><!-- lincense--><div class="license-wrapper"><p> <span>Author:  </span><a href="http://example.com">Bean</a></p><p> <span>Link:  </span><a href="http://example.com/2023/12/24/Redis%E4%B8%BB%E4%BB%8E%E5%90%8C%E6%AD%A5/">http://example.com/2023/12/24/Redis%E4%B8%BB%E4%BB%8E%E5%90%8C%E6%AD%A5/</a></p><p> <span>Copyright:  </span><span>All articles in this blog are licensed under <a rel="license noopener" target="_blank" href="https://creativecommons.org/licenses/by-nc-nd/3.0">CC BY-NC-SA 3.0</a> unless stating additionally.</span></p></div><div class="post-paginator"><a class="nextSlogan" href="/2023/12/24/Redis%E9%9B%86%E7%BE%A4%E6%9C%89%E5%93%AA%E4%BA%9B%E6%96%B9%E6%A1%88/" title="Redis集群有哪些方案"><span>NextPost ></span><br><span class="nextTitle">Redis集群有哪些方案</span></a><div class="clear"></div></div><div id="comment"><div id="SOHUCS" sid="/2023/12/24/Redis%E4%B8%BB%E4%BB%8E%E5%90%8C%E6%AD%A5/"></div><script charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/changyan.js"></script><script>window.changyan.api.config({appid: 'cywUFG3US', conf: '5069ff4a80c8ae40509708fb69d6f29e'});</script></div></section></article><footer id="cxo-footer-outer"><div id="cxo-footer-inner"><p class="footer-container"><span>Site by </span><a target="_blank" rel="noopener" href="http://hexo.io"><span>Hexo</span></a><span> | theme </span><a target="_blank" rel="noopener" href="https://github.com/Longlongyu/hexo-theme-Cxo"><span>Cxo</span></a></p><i class="fa fa-user"> </i><span id="busuanzi_value_site_uv"></span><span> | </span><i class="fa fa-eye"> </i><span id="busuanzi_value_site_pv"></span></div></footer><!-- catelog--><div class="toc-wrapper" style="top: 70vh;"><div class="toc-catalog"><i class="fa fa-list"> </i><span>CATALOG</span></div><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%A8%E9%87%8F%E5%90%8C%E6%AD%A5"><span class="toc-number">1.</span> <span class="toc-text">全量同步</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A2%9E%E9%87%8F%E5%90%8C%E6%AD%A5"><span class="toc-number">2.</span> <span class="toc-text">增量同步</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%A2%9E%E9%87%8F%E5%90%8C%E6%AD%A5%E7%9A%84%E9%A3%8E%E9%99%A9"><span class="toc-number">2.0.1.</span> <span class="toc-text">增量同步的风险</span></a></li></ol></li></ol></li></ol></div><!-- top--><i class="fa fa-arrow-up close" id="go-up" aria-hidden="true"></i></body></html>
