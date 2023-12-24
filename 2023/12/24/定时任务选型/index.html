@@ -1,0 +1,126 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"><meta name="author" content="Bean"><meta name="renderer" content="webkit"><meta name="copyright" content="Bean"><meta name="keywords" content="Hexo"><meta name="description" content=""><meta name="Cache-Control" content="no-cache"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><title>定时任务选型 · Mr.Bean's Blog</title><link rel="stylesheet" href="/css/style.css?v=2018.7.9"><link rel="stylesheet" href="/css/animation.css?v=2018.7.9"><link rel="icon" href="/img/assets/favicon.ico"><link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css?version=1.5.6"><!-- scripts--><script>(function( w ){
+  "use strict";
+  // rel=preload support test
+  if( !w.loadCSS ){
+    w.loadCSS = function(){};
+  }
+  // define on the loadCSS obj
+  var rp = loadCSS.relpreload = {};
+  // rel=preload feature support test
+  // runs once and returns a function for compat purposes
+  rp.support = (function(){
+    var ret;
+    try {
+      ret = w.document.createElement( "link" ).relList.supports( "preload" );
+    } catch (e) {
+      ret = false;
+    }
+    return function(){
+      return ret;
+    };
+  })();
+
+  // if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+  // then change that media back to its intended value on load
+  rp.bindMediaToggle = function( link ){
+    // remember existing media attr for ultimate state, or default to 'all'
+    var finalMedia = link.media || "all";
+
+    function enableStylesheet(){
+      link.media = finalMedia;
+    }
+
+    // bind load handlers to enable media
+    if( link.addEventListener ){
+      link.addEventListener( "load", enableStylesheet );
+    } else if( link.attachEvent ){
+      link.attachEvent( "onload", enableStylesheet );
+    }
+
+    // Set rel and non-applicable media type to start an async request
+    // note: timeout allows this to happen async to let rendering continue in IE
+    setTimeout(function(){
+      link.rel = "stylesheet";
+      link.media = "only x";
+    });
+    // also enable media after 3 seconds,
+    // which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+    setTimeout( enableStylesheet, 3000 );
+  };
+
+  // loop through link elements in DOM
+  rp.poly = function(){
+    // double check this to prevent external calls from running
+    if( rp.support() ){
+      return;
+    }
+    var links = w.document.getElementsByTagName( "link" );
+    for( var i = 0; i < links.length; i++ ){
+      var link = links[ i ];
+      // qualify links to those with rel=preload and as=style attrs
+      if( link.rel === "preload" && link.getAttribute( "as" ) === "style" && !link.getAttribute( "data-loadcss" ) ){
+        // prevent rerunning on link
+        link.setAttribute( "data-loadcss", true );
+        // bind listeners to toggle media back
+        rp.bindMediaToggle( link );
+      }
+    }
+  };
+
+  // if unsupported, run the polyfill
+  if( !rp.support() ){
+    // run once at least
+    rp.poly();
+
+    // rerun poly on an interval until onload
+    var run = w.setInterval( rp.poly, 500 );
+    if( w.addEventListener ){
+      w.addEventListener( "load", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    } else if( w.attachEvent ){
+      w.attachEvent( "onload", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    }
+  }
+
+
+  // commonjs
+  if( typeof exports !== "undefined" ){
+    exports.loadCSS = loadCSS;
+  }
+  else {
+    w.loadCSS = loadCSS;
+  }
+}( typeof global !== "undefined" ? global : this ) );</script><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" defer></script><script src="/js/main.js?v=2018.7.9" defer></script><!-- fancybox--><link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" defer></script><!-- busuanzi--><script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script><meta name="generator" content="Hexo 6.3.0"></head><body><section class="profile-close" id="cxo-profile"><div class="profile-avatar"><i class="fa fa-caret-left"></i><img src="https://raw.githubusercontent.com/bean661/images/main/img/202303272339548.jpg"></div><!--.profile-saying
+  i.fa.fa-comment
+  .saying--><div class="cxo-profile-inner"><div class="profile-name">Bean</div><div class="profile-signature">for me</div><div class="friends"><div>FRIENDS</div><span><a href="https://www.happyshark.cn/" target="_black">AChao</a></span></div><div class="read-progress"></div></div></section><header id="cxo-intro" style="height: 70vh;background-image: url(/img/intro/index-bg.png);"><nav id="cxo-intro-nav"><section><div class="intro-nav-title"><a href="/">Mr.Bean's Blog</a></div><div class="intro-nav-label-box"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div><i class="fa fa-bars intro-nav-menu"><div class="intro-nav-drop"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div></i><div class="clear"></div></section></nav><h1 class="post-title">定时任务选型</h1><div class="post-intros"><div class="post-intro-meta"><span class="post-intro-time"><i class="post-intro-calendar fa fa-edit"></i><span>2023-12-24</span></span><span class="post-intro-tags"><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="分布式"> 分布式</a></span></div><div class="post-intro-read"><span> Word count: <span class="post-count">558</span> | Reading time: <span class="post-count">2</span>min</span></div></div></header><article class="cxo-up" id="cxo-content-outer"><section id="cxo-content-inner"><article class="article-entry" id="post"><h4 id="单机"><a href="#单机" class="headerlink" title="单机"></a>单机</h4><h5 id="java-util-Timer"><a href="#java-util-Timer" class="headerlink" title="java.util.Timer"></a>java.util.Timer</h5><p>单机，不支持cron表达式</p>
+<p>使用小根堆存放任务（根据任务的要执行的时间排序）</p>
+<h5 id="ScheduledExecutorService"><a href="#ScheduledExecutorService" class="headerlink" title="ScheduledExecutorService"></a>ScheduledExecutorService</h5><p>无法使用 Cron 表达式指定任务执行的具体时间</p>
+<h5 id="Spring-Task"><a href="#Spring-Task" class="headerlink" title="Spring Task"></a>Spring Task</h5><p>通过 Spring 提供的 @Scheduled 注解即可定义定时任务</p>
+<p>优点：支持cron表达式</p>
+<p>缺点：功能单一</p>
+<h4 id="分布式："><a href="#分布式：" class="headerlink" title="分布式："></a>分布式：</h4><h5 id="Quartz"><a href="#Quartz" class="headerlink" title="Quartz"></a>Quartz</h5><p>java写的，<code>elastic-job</code>就是基于quartz二次开发之后的分布式调度解决方案。</p>
+<p>Quartz 使用起来也比较麻烦，API 繁琐。</p>
+<p>Quzrtz 并没有内置 UI 管理控制台</p>
+<h5 id="Elastic-Job"><a href="#Elastic-Job" class="headerlink" title="Elastic-Job"></a>Elastic-Job</h5><p>是当当网开源的一个基于Quartz和ZooKeeper的分布式调度解决方案，由两个相互独立的子项目 Elastic-Job-Lite 和 Elastic-Job-Cloud 组成，一般我们只要使用 Elastic-Job-Lite 就好。</p>
+<p><strong>优缺点总结：</strong></p>
+<ul>
+<li>优点 ：可以与 Spring 集成、支持分布式、支持集群、性能不错</li>
+<li>缺点 ：依赖了额外的中间件比如 Zookeeper（复杂度增加，可靠性降低、维护成本变高）</li>
+</ul>
+<h5 id="XXL-JOB"><a href="#XXL-JOB" class="headerlink" title="XXL-JOB"></a>XXL-JOB</h5><p>XXL-JOB 于 2015 年开源，是一款优秀的轻量级分布式任务调度框架，支持任务可视化管理、弹性扩容缩容、任务失败重试和告警、任务分片等功能</p>
+<p><strong>优缺点总结：</strong></p>
+<ul>
+<li>优点：开箱即用（学习成本比较低）、与 Spring 集成、支持分布式、支持集群、内置了 UI 管理控制台。</li>
+<li>缺点：不支持动态添加任务（如果一定想要动态创建任务也是支持的，参见：xxl-job issue277）。</li>
+</ul>
+<p>总结：</p>
+<ul>
+<li><strong>定时任务的相关概念</strong> ：为什么需要定时任务、定时任务中的核心角色、分布式定时任务。</li>
+<li><strong>定时任务的技术选型</strong> ：XXL-JOB 2015 年推出，已经经过了很多年的考验。XXL-JOB 轻量级，并且使用起来非常简单。虽然存在性能瓶颈，但是，在绝大多数情况下，对于企业的基本需求来说是没有影响的。PowerJob 属于分布式任务调度领域里的新星，其稳定性还有待继续考察。ElasticJob 由于在架构设计上是基于 Zookeeper ，而 XXL-JOB 是基于数据库，性能方面的话，ElasticJob 略胜一筹。</li>
+</ul>
+</article><!-- lincense--><div class="license-wrapper"><p> <span>Author:  </span><a href="http://example.com">Bean</a></p><p> <span>Link:  </span><a href="http://example.com/2023/12/24/%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1%E9%80%89%E5%9E%8B/">http://example.com/2023/12/24/%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1%E9%80%89%E5%9E%8B/</a></p><p> <span>Copyright:  </span><span>All articles in this blog are licensed under <a rel="license noopener" target="_blank" href="https://creativecommons.org/licenses/by-nc-nd/3.0">CC BY-NC-SA 3.0</a> unless stating additionally.</span></p></div><div class="post-paginator"><a class="nextSlogan" href="/2023/12/24/%E7%BA%BF%E7%A8%8B%E6%B1%A0%E7%9A%84%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF/" title="线程池的使用场景"><span>NextPost ></span><br><span class="nextTitle">线程池的使用场景</span></a><div class="clear"></div></div><div id="comment"><div id="SOHUCS" sid="/2023/12/24/%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1%E9%80%89%E5%9E%8B/"></div><script charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/changyan.js"></script><script>window.changyan.api.config({appid: 'cywUFG3US', conf: '5069ff4a80c8ae40509708fb69d6f29e'});</script></div></section></article><footer id="cxo-footer-outer"><div id="cxo-footer-inner"><p class="footer-container"><span>Site by </span><a target="_blank" rel="noopener" href="http://hexo.io"><span>Hexo</span></a><span> | theme </span><a target="_blank" rel="noopener" href="https://github.com/Longlongyu/hexo-theme-Cxo"><span>Cxo</span></a></p><i class="fa fa-user"> </i><span id="busuanzi_value_site_uv"></span><span> | </span><i class="fa fa-eye"> </i><span id="busuanzi_value_site_pv"></span></div></footer><!-- catelog--><div class="toc-wrapper" style="top: 70vh;"><div class="toc-catalog"><i class="fa fa-list"> </i><span>CATALOG</span></div><ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8D%95%E6%9C%BA"><span class="toc-number">1.</span> <span class="toc-text">单机</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#java-util-Timer"><span class="toc-number">1.1.</span> <span class="toc-text">java.util.Timer</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#ScheduledExecutorService"><span class="toc-number">1.2.</span> <span class="toc-text">ScheduledExecutorService</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#Spring-Task"><span class="toc-number">1.3.</span> <span class="toc-text">Spring Task</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%86%E5%B8%83%E5%BC%8F%EF%BC%9A"><span class="toc-number">2.</span> <span class="toc-text">分布式：</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#Quartz"><span class="toc-number">2.1.</span> <span class="toc-text">Quartz</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#Elastic-Job"><span class="toc-number">2.2.</span> <span class="toc-text">Elastic-Job</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#XXL-JOB"><span class="toc-number">2.3.</span> <span class="toc-text">XXL-JOB</span></a></li></ol></li></ol></div><!-- top--><i class="fa fa-arrow-up close" id="go-up" aria-hidden="true"></i></body></html>
