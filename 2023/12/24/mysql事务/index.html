@@ -1,0 +1,119 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"><meta name="author" content="Bean"><meta name="renderer" content="webkit"><meta name="copyright" content="Bean"><meta name="keywords" content="Hexo"><meta name="description" content=""><meta name="Cache-Control" content="no-cache"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><title>mysql事务 · Mr.Bean's Blog</title><link rel="stylesheet" href="/css/style.css?v=2018.7.9"><link rel="stylesheet" href="/css/animation.css?v=2018.7.9"><link rel="icon" href="/img/assets/favicon.ico"><link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css?version=1.5.6"><!-- scripts--><script>(function( w ){
+  "use strict";
+  // rel=preload support test
+  if( !w.loadCSS ){
+    w.loadCSS = function(){};
+  }
+  // define on the loadCSS obj
+  var rp = loadCSS.relpreload = {};
+  // rel=preload feature support test
+  // runs once and returns a function for compat purposes
+  rp.support = (function(){
+    var ret;
+    try {
+      ret = w.document.createElement( "link" ).relList.supports( "preload" );
+    } catch (e) {
+      ret = false;
+    }
+    return function(){
+      return ret;
+    };
+  })();
+
+  // if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+  // then change that media back to its intended value on load
+  rp.bindMediaToggle = function( link ){
+    // remember existing media attr for ultimate state, or default to 'all'
+    var finalMedia = link.media || "all";
+
+    function enableStylesheet(){
+      link.media = finalMedia;
+    }
+
+    // bind load handlers to enable media
+    if( link.addEventListener ){
+      link.addEventListener( "load", enableStylesheet );
+    } else if( link.attachEvent ){
+      link.attachEvent( "onload", enableStylesheet );
+    }
+
+    // Set rel and non-applicable media type to start an async request
+    // note: timeout allows this to happen async to let rendering continue in IE
+    setTimeout(function(){
+      link.rel = "stylesheet";
+      link.media = "only x";
+    });
+    // also enable media after 3 seconds,
+    // which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+    setTimeout( enableStylesheet, 3000 );
+  };
+
+  // loop through link elements in DOM
+  rp.poly = function(){
+    // double check this to prevent external calls from running
+    if( rp.support() ){
+      return;
+    }
+    var links = w.document.getElementsByTagName( "link" );
+    for( var i = 0; i < links.length; i++ ){
+      var link = links[ i ];
+      // qualify links to those with rel=preload and as=style attrs
+      if( link.rel === "preload" && link.getAttribute( "as" ) === "style" && !link.getAttribute( "data-loadcss" ) ){
+        // prevent rerunning on link
+        link.setAttribute( "data-loadcss", true );
+        // bind listeners to toggle media back
+        rp.bindMediaToggle( link );
+      }
+    }
+  };
+
+  // if unsupported, run the polyfill
+  if( !rp.support() ){
+    // run once at least
+    rp.poly();
+
+    // rerun poly on an interval until onload
+    var run = w.setInterval( rp.poly, 500 );
+    if( w.addEventListener ){
+      w.addEventListener( "load", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    } else if( w.attachEvent ){
+      w.attachEvent( "onload", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    }
+  }
+
+
+  // commonjs
+  if( typeof exports !== "undefined" ){
+    exports.loadCSS = loadCSS;
+  }
+  else {
+    w.loadCSS = loadCSS;
+  }
+}( typeof global !== "undefined" ? global : this ) );</script><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" defer></script><script src="/js/main.js?v=2018.7.9" defer></script><!-- fancybox--><link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" defer></script><!-- busuanzi--><script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script><meta name="generator" content="Hexo 6.3.0"></head><body><section class="profile-close" id="cxo-profile"><div class="profile-avatar"><i class="fa fa-caret-left"></i><img src="https://raw.githubusercontent.com/bean661/images/main/img/202303272339548.jpg"></div><!--.profile-saying
+  i.fa.fa-comment
+  .saying--><div class="cxo-profile-inner"><div class="profile-name">Bean</div><div class="profile-signature">for me</div><div class="friends"><div>FRIENDS</div><span><a href="https://www.happyshark.cn/" target="_black">AChao</a></span></div><div class="read-progress"></div></div></section><header id="cxo-intro" style="height: 70vh;background-image: url(/img/intro/index-bg.png);"><nav id="cxo-intro-nav"><section><div class="intro-nav-title"><a href="/">Mr.Bean's Blog</a></div><div class="intro-nav-label-box"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div><i class="fa fa-bars intro-nav-menu"><div class="intro-nav-drop"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div></i><div class="clear"></div></section></nav><h1 class="post-title">mysql事务</h1><div class="post-intros"><div class="post-intro-meta"><span class="post-intro-time"><i class="post-intro-calendar fa fa-edit"></i><span>2023-12-24</span></span><span class="post-intro-tags"><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="mysql"> mysql</a></span></div><div class="post-intro-read"><span> Word count: <span class="post-count">1.2k</span> | Reading time: <span class="post-count">4</span>min</span></div></div></header><article class="cxo-up" id="cxo-content-outer"><section id="cxo-content-inner"><article class="article-entry" id="post"><h2 id="事务的介绍"><a href="#事务的介绍" class="headerlink" title="事务的介绍"></a>事务的介绍</h2><p>概述：由多个操作组成的一个逻辑单元，组成这个逻辑单元的多个操作要么都成功，要么都失败。</p>
+<blockquote>
+<p>举例：转账<br>A向B转账500，转账成功，A扣除500元，B增加500元<br>A向B转账500，转账未成功，A已经扣除的500元要恢复，B不变</p>
+</blockquote>
+<h2 id="ACID是什么"><a href="#ACID是什么" class="headerlink" title="ACID是什么"></a>ACID是什么</h2><ol>
+<li><p>A&#x3D;Atomicity原子性：就是上面说的,要么全部成功,要么全部失败，不可能只执行一部分操作。</p>
+</li>
+<li><p>C&#x3D;Consistency一致性：系统(数据库)总是从一个一致性的状态转移到另一个一致性的状态,不会存在中间状态，由另外三个性质所保证。</p>
+</li>
+<li><p>I&#x3D;Isolation隔离性: 通常来说:一个事务在完全提交之前,对其他事务是不可见的.注意前面的通常来说加了红色,意味着有例外情况。</p>
+</li>
+<li><p>D&#x3D;Durability持久性：一旦事务提交,那么就永远是这样子了,哪怕系统崩溃也不会影响到这个事务的结果。</p>
+</li>
+</ol>
+<h2 id="并发事务带来哪些问题"><a href="#并发事务带来哪些问题" class="headerlink" title="并发事务带来哪些问题"></a>并发事务带来哪些问题</h2><p>在典型的应用程序中，多个事务并发运行，经常会操作相同的数据来完成各自的任务（多个用户对同一数据进行操作）。并发虽然是必须的，但可能会导致以下的问题。<br><strong>脏读（Dirty read）</strong>: 当一个事务正在访问数据并且对数据进行了修改，而这种修改还没有提交到数据库中，这时另外一个事务也访问了这个数据，然后使用了这个数据。因为这个数据是还没有提交的数据，那么另外一个事务读到的这个数据是“脏数据”，依据“脏数据”所做的操作可能是不正确的。<br><strong>丢失修改（Lost to modify）</strong>：指在一个事务读取一个数据时，另外一个事务也访问了该数据，那么在第一个事务中修改了这个数据后，第二个事务也修改了这个数据。这样第一个事务内的修改结果就被丢失，因此称为丢失修改。 例如：事务1读取某表中的数据A&#x3D;20，事务2也读取A&#x3D;20，事务1修改A&#x3D;A-1，事务2也修改A&#x3D;A-1，最终结果A&#x3D;19，事务1的修改被丢失。<br><strong>不可重复读（Unrepeatableread）</strong>：指在一个事务内多次读同一数据。在这个事务还没有结束时，另一个事务也访问该数据。那么，在第一个事务中的两次读数据之间，由于第二个事务的修改导致第一个事务两次读取的数据可能不太一样。这就发生了在一个事务内两次读到的数据是不一样的情况，因此称为不可重复读。<br><strong>幻读（Phantom read）</strong>：幻读与不可重复读类似。它发生在一个事务（T1）读取了几行数据，接着另一个并发事务（T2）插入了一些数据时。在随后的查询中，第一个事务（T1）就会发现多了一些原本不存在的记录，就好像发生了幻觉一样，所以称为幻读。</p>
+<h2 id="事务的隔离级别-mysql的默认隔离级别"><a href="#事务的隔离级别-mysql的默认隔离级别" class="headerlink" title="事务的隔离级别 mysql的默认隔离级别"></a>事务的隔离级别 mysql的默认隔离级别</h2><p>MySQL的四种隔离级别如下:<br>**未提交读(READ UNCOMMITTED)**：这个隔离级别下,其他事务可以看到本事务没有提交的部分修改。因此会造成脏读的问题(读取到了其他事务未提交的部分,而之后该事务进行了回滚)。这个级别的性能没有足够大的优势,但是又有很多的问题,因此很少使用</p>
+<p><strong>已提交读(READ COMMITTED)<strong>：其他事务只能读取到本事务已经提交的部分。这个隔离级别有不可重复读的问题，在同一个事务内的两次读取,拿到的结果竟然不一样,因为另外一个事务对数据进行了修改。</strong>解决脏读</strong>。</p>
+<p><strong>REPEATABLE READ(可重复读)<strong>：可重复读隔离级别解决了上面不可重复读的问题(看名字也知道)，但是不能完全解决幻读。MySql默认的</strong>事务隔离级别</strong>就是：REPEATABLE READ，<strong>解决脏读，不可重复读。</strong></p>
+<p><strong>SERIALIZABLE(可串行化)<strong>：这是最高的隔离级别,可以解决上面提到的所有问题,因为他强制将所以的操作串行执行,这会导致并发性能极速下降,因此也不是很常用。</strong>解决脏读，不可重复读，幻读。</strong></p>
+</article><!-- lincense--><div class="license-wrapper"><p> <span>Author:  </span><a href="http://example.com">Bean</a></p><p> <span>Link:  </span><a href="http://example.com/2023/12/24/mysql%E4%BA%8B%E5%8A%A1/">http://example.com/2023/12/24/mysql%E4%BA%8B%E5%8A%A1/</a></p><p> <span>Copyright:  </span><span>All articles in this blog are licensed under <a rel="license noopener" target="_blank" href="https://creativecommons.org/licenses/by-nc-nd/3.0">CC BY-NC-SA 3.0</a> unless stating additionally.</span></p></div><div class="post-paginator"><a class="nextSlogan" href="/2023/12/24/%E7%BA%BF%E7%A8%8B%E6%B1%A0/" title="线程池"><span>NextPost ></span><br><span class="nextTitle">线程池</span></a><div class="clear"></div></div><div id="comment"><div id="SOHUCS" sid="/2023/12/24/mysql%E4%BA%8B%E5%8A%A1/"></div><script charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/changyan.js"></script><script>window.changyan.api.config({appid: 'cywUFG3US', conf: '5069ff4a80c8ae40509708fb69d6f29e'});</script></div></section></article><footer id="cxo-footer-outer"><div id="cxo-footer-inner"><p class="footer-container"><span>Site by </span><a target="_blank" rel="noopener" href="http://hexo.io"><span>Hexo</span></a><span> | theme </span><a target="_blank" rel="noopener" href="https://github.com/Longlongyu/hexo-theme-Cxo"><span>Cxo</span></a></p><i class="fa fa-user"> </i><span id="busuanzi_value_site_uv"></span><span> | </span><i class="fa fa-eye"> </i><span id="busuanzi_value_site_pv"></span></div></footer><!-- catelog--><div class="toc-wrapper" style="top: 70vh;"><div class="toc-catalog"><i class="fa fa-list"> </i><span>CATALOG</span></div><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8B%E5%8A%A1%E7%9A%84%E4%BB%8B%E7%BB%8D"><span class="toc-number">1.</span> <span class="toc-text">事务的介绍</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ACID%E6%98%AF%E4%BB%80%E4%B9%88"><span class="toc-number">2.</span> <span class="toc-text">ACID是什么</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B9%B6%E5%8F%91%E4%BA%8B%E5%8A%A1%E5%B8%A6%E6%9D%A5%E5%93%AA%E4%BA%9B%E9%97%AE%E9%A2%98"><span class="toc-number">3.</span> <span class="toc-text">并发事务带来哪些问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8B%E5%8A%A1%E7%9A%84%E9%9A%94%E7%A6%BB%E7%BA%A7%E5%88%AB-mysql%E7%9A%84%E9%BB%98%E8%AE%A4%E9%9A%94%E7%A6%BB%E7%BA%A7%E5%88%AB"><span class="toc-number">4.</span> <span class="toc-text">事务的隔离级别 mysql的默认隔离级别</span></a></li></ol></div><!-- top--><i class="fa fa-arrow-up close" id="go-up" aria-hidden="true"></i></body></html>
