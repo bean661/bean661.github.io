@@ -1,0 +1,169 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"><meta name="author" content="Bean"><meta name="renderer" content="webkit"><meta name="copyright" content="Bean"><meta name="keywords" content="Hexo"><meta name="description" content=""><meta name="Cache-Control" content="no-cache"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><title>秋招总结 · Mr.Bean's Blog</title><link rel="stylesheet" href="/css/style.css?v=2018.7.9"><link rel="stylesheet" href="/css/animation.css?v=2018.7.9"><link rel="icon" href="/img/assets/favicon.ico"><link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css?version=1.5.6"><!-- scripts--><script>(function( w ){
+  "use strict";
+  // rel=preload support test
+  if( !w.loadCSS ){
+    w.loadCSS = function(){};
+  }
+  // define on the loadCSS obj
+  var rp = loadCSS.relpreload = {};
+  // rel=preload feature support test
+  // runs once and returns a function for compat purposes
+  rp.support = (function(){
+    var ret;
+    try {
+      ret = w.document.createElement( "link" ).relList.supports( "preload" );
+    } catch (e) {
+      ret = false;
+    }
+    return function(){
+      return ret;
+    };
+  })();
+
+  // if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+  // then change that media back to its intended value on load
+  rp.bindMediaToggle = function( link ){
+    // remember existing media attr for ultimate state, or default to 'all'
+    var finalMedia = link.media || "all";
+
+    function enableStylesheet(){
+      link.media = finalMedia;
+    }
+
+    // bind load handlers to enable media
+    if( link.addEventListener ){
+      link.addEventListener( "load", enableStylesheet );
+    } else if( link.attachEvent ){
+      link.attachEvent( "onload", enableStylesheet );
+    }
+
+    // Set rel and non-applicable media type to start an async request
+    // note: timeout allows this to happen async to let rendering continue in IE
+    setTimeout(function(){
+      link.rel = "stylesheet";
+      link.media = "only x";
+    });
+    // also enable media after 3 seconds,
+    // which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+    setTimeout( enableStylesheet, 3000 );
+  };
+
+  // loop through link elements in DOM
+  rp.poly = function(){
+    // double check this to prevent external calls from running
+    if( rp.support() ){
+      return;
+    }
+    var links = w.document.getElementsByTagName( "link" );
+    for( var i = 0; i < links.length; i++ ){
+      var link = links[ i ];
+      // qualify links to those with rel=preload and as=style attrs
+      if( link.rel === "preload" && link.getAttribute( "as" ) === "style" && !link.getAttribute( "data-loadcss" ) ){
+        // prevent rerunning on link
+        link.setAttribute( "data-loadcss", true );
+        // bind listeners to toggle media back
+        rp.bindMediaToggle( link );
+      }
+    }
+  };
+
+  // if unsupported, run the polyfill
+  if( !rp.support() ){
+    // run once at least
+    rp.poly();
+
+    // rerun poly on an interval until onload
+    var run = w.setInterval( rp.poly, 500 );
+    if( w.addEventListener ){
+      w.addEventListener( "load", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    } else if( w.attachEvent ){
+      w.attachEvent( "onload", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    }
+  }
+
+
+  // commonjs
+  if( typeof exports !== "undefined" ){
+    exports.loadCSS = loadCSS;
+  }
+  else {
+    w.loadCSS = loadCSS;
+  }
+}( typeof global !== "undefined" ? global : this ) );</script><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" defer></script><script src="/js/main.js?v=2018.7.9" defer></script><!-- fancybox--><link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" defer></script><!-- busuanzi--><script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script><meta name="generator" content="Hexo 6.3.0"></head><body><section class="profile-close" id="cxo-profile"><div class="profile-avatar"><i class="fa fa-caret-left"></i><img src="https://raw.githubusercontent.com/bean661/images/main/img/202303272339548.jpg"></div><!--.profile-saying
+  i.fa.fa-comment
+  .saying--><div class="cxo-profile-inner"><div class="profile-name">Bean</div><div class="profile-signature">for me</div><div class="friends"><div>FRIENDS</div><span><a href="https://www.happyshark.cn/" target="_black">AChao</a></span></div><div class="read-progress"></div></div></section><header id="cxo-intro" style="height: 70vh;background-image: url(/img/intro/index-bg.png);"><nav id="cxo-intro-nav"><section><div class="intro-nav-title"><a href="/">Mr.Bean's Blog</a></div><div class="intro-nav-label-box"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div><i class="fa fa-bars intro-nav-menu"><div class="intro-nav-drop"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div></i><div class="clear"></div></section></nav><h1 class="post-title">秋招总结</h1><div class="post-intros"><div class="post-intro-meta"><span class="post-intro-time"><i class="post-intro-calendar fa fa-edit"></i><span>2024-01-22</span></span><span class="post-intro-tags"><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="秋招总结"> 秋招总结</a></span></div><div class="post-intro-read"><span> Word count: <span class="post-count">2.3k</span> | Reading time: <span class="post-count">7</span>min</span></div></div></header><article class="cxo-up" id="cxo-content-outer"><section id="cxo-content-inner"><article class="article-entry" id="post"><h4 id="大概情况："><a href="#大概情况：" class="headerlink" title="大概情况："></a>大概情况：</h4><p>        双非本 软件工程，末流211硕 计算机科学与技术，没有实习经历，一篇SCI一区在投，一篇专利。从八月多开始投简历，投了也有几百家 互联网 银行 国企 能都的都投了，也收到了很多家的笔试，一面也收到了二三十家，但基本上都在一面挂了。从八月到十一月，一直处于笔试 面试 背八股和面经的过程中，情绪极低，身体也出了问题，状态很差。在十一月底进行彻底复盘总结，十二月份，边实习边找工作，发面的公司，全部面试通过发offer，最总选择了上海 java开发岗。</p>
+<p>总结，一路摸石头过河，遇到的坑太多太多。</p>
+<h4 id="实习："><a href="#实习：" class="headerlink" title="实习："></a>实习：</h4><p>        大概流程： 投递简历-简历筛选-笔试-一论或多轮技术面试-hr面试-发实习offer</p>
+<p>        招聘信息渠道：</p>
+<ol>
+<li><p> 企业官方的公众号</p>
+</li>
+<li><p>第三方的公众号： 校招推推 校招攻略 offershow 等等</p>
+</li>
+<li><p>其他：牛客 boss直聘</p>
+</li>
+</ol>
+<p>        参加过秋招的同学肯定知道，实习的重要性不言而喻，我个人也在3月-6月找过实习，不过自己太菜了，一直在被虐，所以也就没有找到合适的实习公司。</p>
+<ol>
+<li><p>首先在秋招时，有的公司在<strong>简历筛选</strong>时，没有实习经历的，就直接挂掉了，很真实。</p>
+</li>
+<li><p>再到<strong>技术面</strong>时，面试官为什么没有实习呀，。。。只能找个借口 说导师不让实习。。。，然后再问你的项目，这些项目都是你自己做的吗，我好像很熟悉（其实都是网上的项目，虽然包装一下，但是千篇一律）。 有的技术面看到没有实习经历的，或者不是自己开发的项目，只是网上学习项目，就直接kpi了，本人确实遇到过，当然这种也不是什么好公司。</p>
+</li>
+<li><p>再到<strong>hr面</strong>时，面试官会根据有没有实习酌情评分。</p>
+</li>
+</ol>
+<p>所以说，实习还是要能去的就去的，而且，很多厂的实习有<strong>转正</strong>机会，如果是自己满意的公司，那就不需要卷秋招和春招了，很累很累。</p>
+<p>当然现在很多大厂很卷，有的大厂甚至专门找有实习经历的学生，所以如果时间充裕可以先从小厂的日常实习开始，简历内容也会更丰富。</p>
+<p>再说一下想去实习需要哪些知识储备吧：</p>
+<p>虽然我没有参加实习，但是我也准备了一段时间，有一定的总结和反思。</p>
+<ol>
+<li><p>计算机基础知识： 网络，操作系统，Mysql  这些都是要准备的，可以参考小林的博客 <a target="_blank" rel="noopener" href="https://www.xiaolincoding.com/">https://www.xiaolincoding.com/</a> 比如常见的三次握手，四次挥手，为什么需要三次握手而不是两次或四次  TCP IP 等等，准备的越广越深，面试通过率就越大。</p>
+</li>
+<li><p>八股文： 这里推荐看<a target="_blank" rel="noopener" href="https://javaguide.cn/">Java 面试指南 | JavaGuide</a>，当然小林的也有redis，讲的很好。</p>
+</li>
+<li><p>项目： 学一到两个项目，最少一个项目是分布式的，因为现在的公司基本上都是分布式了，还有一些中间件，kafka，rabbitmq，等等，定时任务xxl job，项目基本上都是在b站学习黑马的，其他的了解的不是很多。两个项目准备也基本上需要3个月左右。</p>
+</li>
+<li><p>刷题，想进好一点的公司，刷题是必不可少的，基本上都是在leetcode刷题，刷题是一个漫长的过程，主要是题目需要理解和消化，每天可以刷个一两道，长期积累。我个人比较推荐 <a target="_blank" rel="noopener" href="https://www.programmercarl.com/">代码随想录 (programmercarl.com)</a>的风格，分模块刷题，当然还有 <a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1r94y1S78M">https://www.bilibili.com/video/BV1r94y1S78M</a> 刷地玩编程(java)。在笔试中会有coding，在面试中，如果是大厂或者是知名的厂，有的会让手撕（共享屏幕写出来），不过其他的厂基本上没有，顶多说一下思路。也有一些笔试会考试sql编程，不过很少，想刷的话可以在牛客刷。</p>
+</li>
+<li><p>刷面经：参考下文的面经。</p>
+</li>
+</ol>
+<p>总结： 能实习就赶快实习，无论是日常还是寒暑假；小厂实习是大厂实习的跳板；实习前的知识准备也需要很长时间，提前做规划，开始投实习的时候再准备就已经晚了。</p>
+<h4 id="秋招："><a href="#秋招：" class="headerlink" title="秋招："></a>秋招：</h4><p>        大概流程： 投递简历-简历筛选-笔试-一论或多轮技术面试-hr面试-发offer</p>
+<p>        秋招最早开应该是在七月份，一些大厂会开一些提前批，主要筛选优秀的人才，当然，如果能实习转正到满意公司的就不需要考虑秋招了。</p>
+<p>        有实习的，秋招会占很大优势！因为一方面实习经历可以证明自己确实干过该岗位，在正规的开发环境下工作过，如果再加上理论知识都能答上来，那面试的通过率很大。</p>
+<p>知识储备：</p>
+<ol>
+<li><p>计算机基础知识： 和实习的一样，自己能看多深就看多深，对于一个问题，不仅要知道怎么做，还要知道为什么这么做。</p>
+</li>
+<li><p>八股文： 八股文也讲究准备的深度，如果只是略懂皮毛，那肯定是不行的，比如：java开发中常用的锁有哪些， 回答 synchronized，lock，以及使用方法 trylook unlook；这个深度还是不够的，要知道synchronized的底层，锁的原理，锁升级机制的原理，reetrantlock的底层AQS 什么是AQS。再如redis，只知道简单的五大数据类型特点和使用场景 雪崩 击穿 这些肯定不行，最起码要知道底层的 压缩链表 跳表 SDS等等。所以说，不但要有的知识的广度，还有深度，不然面试官往下一问，就回答不上来了。</p>
+</li>
+<li><p>项目： 如果有实习的，可以把实习项目放上，没有实习的就放自己的项目。在简历中列出来的点，必须能完成的解答，讲的越好，越加分。</p>
+</li>
+<li><p>刷题：刷题是必不可少的，和实习一样，不要觉得自己笨，每个人都是这样过来的。</p>
+</li>
+<li><p>刷面经：参考下文的面经。</p>
+</li>
+</ol>
+<p>招聘信息渠道：</p>
+<ol>
+<li><p>企业官方的公众号</p>
+</li>
+<li><p>第三方的公众号： 校招推推 校招攻略 offershow 等等</p>
+</li>
+<li><p>其他：牛客 boss直聘</p>
+</li>
+</ol>
+<h4 id="面经："><a href="#面经：" class="headerlink" title="面经："></a>面经：</h4><p>        对于一些国企，银行类的，面试的深度和广度都不是很大，比起私企的强度还是小了很多。</p>
+<p>        自己会的就多说一点，说的好就是加分。回答过程中也可以引导面试官往下问，比如面试官问： 说一下java中常用的锁以及他们的区别，说了synchronized reetrantlock，使用的不同，最后说一句reetrantlock在高并发的情况下更好，那面试官就会问，为什么，这就属于引导面试官了，当然不会的情况下，就不要给自己挖坑了。</p>
+<p>        <strong>面试的机会要珍惜，不要在一次次面试失败中总结原因，这样成本是很高的。秋招本来就是一个很忙的过程，面试的机会本来就很少，如果要靠一次次面试没过，来查找自己的缺点，那代价太高太高</strong>，所以要提前刷面经，1. 是b站上的面经，<a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1KU4y1J7p2/?vd_source=7d8cb140d1ab447823e2dcd3e3b2f8db">Java面试400题，保姆式教程，教科书式标准回答</a>，  <a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1yT411H7YK/?vd_source=7d8cb140d1ab447823e2dcd3e3b2f8db">新版Java面试专题视频教程，java八股文面试全套真题+深度详解（含大厂高频面试真题）</a> ， <a target="_blank" rel="noopener" href="https://space.bilibili.com/449100051?spm_id_from=333.999.0.0">IT枫斗者-Java面试的个人空间</a> ， <a target="_blank" rel="noopener" href="https://space.bilibili.com/1158959550?spm_id_from=333.999.0.0">博添项目训练营的个人空间</a>这些面经基本上每次面试都能命中一些，所以要提前看  提前看 提前看 2. 一般公司通知面试只有几天的时间准备，这时候可以在<strong>牛客</strong>搜一下其他人关于这个公司相关的面经。</p>
+<p>        hr面：一般会聊一些主管的问题，个人相关的问题，比如：为什么选择来这个城市（不建议说对象xx，可以说父母在这个城市，如果深问就再细说，提前想好），我们公司哪里比较吸引你，你的三个优点和缺点，你的爱好，期望的薪资，做简历上某件事最大的收获，某件事遇到的最大困难，未来职业规划。</p>
+<h4 id="薪资："><a href="#薪资：" class="headerlink" title="薪资："></a>薪资：</h4><p>        面试通过后，私企的话会进行谈心，需要提前了解该公司给应届生开的价格，比如boss，牛客，offershow小程序，脉脉 能搜索到的都可以参考，根据自己的情况要价。</p>
+<p>还有其他的五险一金比例，加班情况，福利情况，年终，等等都需要自己进行在网上查找，看是否能达到自己的期望。</p>
+</article><!-- lincense--><div class="license-wrapper"><p> <span>Author:  </span><a href="http://example.com">Bean</a></p><p> <span>Link:  </span><a href="http://example.com/2024/01/21/%E7%A7%8B%E6%8B%9B%E6%80%BB%E7%BB%93/">http://example.com/2024/01/21/%E7%A7%8B%E6%8B%9B%E6%80%BB%E7%BB%93/</a></p><p> <span>Copyright:  </span><span>All articles in this blog are licensed under <a rel="license noopener" target="_blank" href="https://creativecommons.org/licenses/by-nc-nd/3.0">CC BY-NC-SA 3.0</a> unless stating additionally.</span></p></div><div class="post-paginator"><a class="nextSlogan" href="/2023/12/24/Kafka%E5%AE%9E%E7%8E%B0%E9%AB%98%E6%80%A7%E8%83%BD%E7%9A%84%E8%AE%BE%E8%AE%A1/" title="Kafka实现高性能的设计"><span>NextPost ></span><br><span class="nextTitle">Kafka实现高性能的设计</span></a><div class="clear"></div></div><div id="comment"><div id="SOHUCS" sid="/2024/01/21/%E7%A7%8B%E6%8B%9B%E6%80%BB%E7%BB%93/"></div><script charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/changyan.js"></script><script>window.changyan.api.config({appid: 'cywUFG3US', conf: '5069ff4a80c8ae40509708fb69d6f29e'});</script></div></section></article><footer id="cxo-footer-outer"><div id="cxo-footer-inner"><p class="footer-container"><span>Site by </span><a target="_blank" rel="noopener" href="http://hexo.io"><span>Hexo</span></a><span> | theme </span><a target="_blank" rel="noopener" href="https://github.com/Longlongyu/hexo-theme-Cxo"><span>Cxo</span></a></p><i class="fa fa-user"> </i><span id="busuanzi_value_site_uv"></span><span> | </span><i class="fa fa-eye"> </i><span id="busuanzi_value_site_pv"></span></div></footer><!-- catelog--><div class="toc-wrapper" style="top: 70vh;"><div class="toc-catalog"><i class="fa fa-list"> </i><span>CATALOG</span></div><ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%A4%A7%E6%A6%82%E6%83%85%E5%86%B5%EF%BC%9A"><span class="toc-number">1.</span> <span class="toc-text">大概情况：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AE%9E%E4%B9%A0%EF%BC%9A"><span class="toc-number">2.</span> <span class="toc-text">实习：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%A7%8B%E6%8B%9B%EF%BC%9A"><span class="toc-number">3.</span> <span class="toc-text">秋招：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%9D%A2%E7%BB%8F%EF%BC%9A"><span class="toc-number">4.</span> <span class="toc-text">面经：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%96%AA%E8%B5%84%EF%BC%9A"><span class="toc-number">5.</span> <span class="toc-text">薪资：</span></a></li></ol></div><!-- top--><i class="fa fa-arrow-up close" id="go-up" aria-hidden="true"></i></body></html>
